@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 public class Main extends Game {
 	private static Main instance;
 
-	public static final String NAME = "game_template";
+	public static final String NAME = "Evo";
 
 	private final AssetManager assetManager;
 	private ConfigManager configManager;
