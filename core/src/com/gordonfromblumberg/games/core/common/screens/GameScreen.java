@@ -2,6 +2,7 @@ package com.gordonfromblumberg.games.core.common.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -10,11 +11,13 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.model.GameWorld;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 import com.gordonfromblumberg.games.core.common.utils.StringUtils;
+import com.gordonfromblumberg.games.core.evo.creature.Creature;
 
 public class GameScreen extends AbstractScreen {
     private static final String LABEL = "Mouse on ";
@@ -24,9 +27,12 @@ public class GameScreen extends AbstractScreen {
     private GameWorld gameWorld;
 
     private final Vector3 coords = new Vector3();
+    private Creature creature;
 
     protected GameScreen(SpriteBatch batch) {
         super(batch);
+
+        color = Color.WHITE;
     }
 
     @Override
@@ -50,6 +56,18 @@ public class GameScreen extends AbstractScreen {
                 return true;
             }
         });
+
+        creature = new Creature(null);
+        creature.setRegion("herbivorous");
+        creature.setPosition(0, 0);
+        creature.setSize(64, 64);
+
+        stage.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                creature.setTarget(x, y);
+            }
+        });
     }
 
     @Override
@@ -71,11 +89,13 @@ public class GameScreen extends AbstractScreen {
 
         super.update(delta);            // apply camera moving and update batch projection matrix
         gameWorld.update(delta);        // update game state
+        creature.update(delta);
     }
 
     @Override
     protected void renderWorld(float delta) {
-        batch.draw(background, 0, 0);
+//        batch.draw(background, 0, 0);
+        creature.render(batch);
         gameWorld.render(batch);
     }
 

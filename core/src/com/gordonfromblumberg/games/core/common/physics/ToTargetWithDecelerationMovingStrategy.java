@@ -19,7 +19,7 @@ public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrate
     }
 
     @Override
-    protected void setMaxVelocity(float maxVelocity) {
+    public void setMaxVelocity(float maxVelocity) {
         super.setMaxVelocity(maxVelocity);
 
         float calculatedDecelerationDist = calcDecelerationDist();

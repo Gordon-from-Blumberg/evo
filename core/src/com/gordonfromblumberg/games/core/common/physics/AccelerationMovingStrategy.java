@@ -25,12 +25,12 @@ public class AccelerationMovingStrategy implements MovingStrategy {
         position.mulAdd(velocity, dt);
     }
 
-    protected void setMaxVelocity(float maxVelocity) {
+    public void setMaxVelocity(float maxVelocity) {
         this.maxVelocity = maxVelocity;
         this.maxVelocity2 = maxVelocity * maxVelocity;
     }
 
-    protected void setMaxAcceleration(float maxAcceleration) {
+    public void setMaxAcceleration(float maxAcceleration) {
         this.maxAcceleration = maxAcceleration;
         this.maxAcceleration2 = maxAcceleration * maxAcceleration;
     }
