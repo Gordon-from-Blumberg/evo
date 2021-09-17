@@ -10,9 +10,13 @@ public class PhysicsGameObject extends GameObject {
 
     protected MovingStrategy movingStrategy;
 
+    protected boolean turnInVelocityDirection = true;
+
     {
         this.colliding = true;
     }
+
+    public PhysicsGameObject() {}
 
     @SuppressWarnings("rawtypes")
     public PhysicsGameObject(Pool pool) {
@@ -25,6 +29,9 @@ public class PhysicsGameObject extends GameObject {
 
         if (movingStrategy != null)
             movingStrategy.update(position, velocity, acceleration, delta);
+
+        if (turnInVelocityDirection)
+            setRotation(velocity.angleDeg() - 90);
 
         adjustPosition();
         polygon.setPosition(position.x, position.y);

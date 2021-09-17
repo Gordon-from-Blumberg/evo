@@ -6,14 +6,23 @@ import com.gordonfromblumberg.games.core.common.physics.ToTargetWithDeceleration
 
 public class Creature extends PhysicsGameObject {
 
-    public Creature(Pool pool) {
-        super(pool);
+    private static final Pool<Creature> pool = new Pool<Creature>() {
+        @Override
+        protected Creature newObject() {
+            return new Creature();
+        }
+    };
 
-        ToTargetWithDecelerationMovingStrategy str = new ToTargetWithDecelerationMovingStrategy(100);
-        str.setMaxVelocity(100);
-        str.setMaxAcceleration(200);
+    private Creature() {
+        ToTargetWithDecelerationMovingStrategy str = new ToTargetWithDecelerationMovingStrategy(1000);
+        str.setMaxVelocity(200);
+        str.setMaxAcceleration(500);
 
         movingStrategy = str;
+    }
+
+    public static Creature getInstance() {
+        return pool.obtain();
     }
 
     public void setTarget(float x, float y) {

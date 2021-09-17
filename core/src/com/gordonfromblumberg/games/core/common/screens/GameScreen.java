@@ -57,15 +57,19 @@ public class GameScreen extends AbstractScreen {
             }
         });
 
-        creature = new Creature(null);
+        creature = Creature.getInstance();
         creature.setRegion("herbivorous");
-        creature.setPosition(0, 0);
+        creature.setPosition(32, 32);
         creature.setSize(64, 64);
 
         stage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                creature.setTarget(x, y);
+                // coords don't work
+                coords.x = x;
+                coords.y = y;
+                gameWorld.convertScreenToWorld(coords);
+                creature.setTarget(coords.x, coords.y);
             }
         });
     }

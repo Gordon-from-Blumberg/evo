@@ -87,6 +87,10 @@ public class GameObject implements Disposable, Pool.Poolable {
         updateVertices();
     }
 
+    public void setRotation(float deg) {
+        polygon.setRotation(deg);
+    }
+
     protected void updateVertices() {
         final float width = this.width;
         final float height = this.height;
