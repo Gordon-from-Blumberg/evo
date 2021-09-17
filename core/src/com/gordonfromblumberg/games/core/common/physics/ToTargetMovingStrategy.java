@@ -1,5 +1,6 @@
 package com.gordonfromblumberg.games.core.common.physics;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 public class ToTargetMovingStrategy extends AccelerationMovingStrategy {
@@ -23,15 +24,15 @@ public class ToTargetMovingStrategy extends AccelerationMovingStrategy {
     public void update(Vector2 position, Vector2 velocity, Vector2 acceleration, float dt) {
         final Vector2 desiredMovement = this.desiredMovement;
         final Vector2 desiredVelocity = this.desiredVelocity;
-
+        Gdx.app.log("Position", "Position = " + position);
+        Gdx.app.log("Velocity", "Velocity = " + velocity);
         desiredMovement.set(target).sub(position);
+        Gdx.app.log("DesMovmnt", "DesMovmnt = " + desiredMovement);
         desiredVelocity.set(desiredMovement);
-        if (maxVelocity2 > 0)
-            desiredVelocity.limit2(getVelocityLimit());
-
+        adjustDesiredVelocity();
+        Gdx.app.log("DesVel", "DesVel = " + desiredVelocity);
         acceleration.set(desiredVelocity).sub(velocity);
-        limitAcceleration(velocity, acceleration);
-
+        Gdx.app.log("Accel", "Accel = " + acceleration);
         super.update(position, velocity, acceleration, dt);
     }
 
@@ -44,9 +45,8 @@ public class ToTargetMovingStrategy extends AccelerationMovingStrategy {
         return maxVelocity2;
     }
 
-    protected void limitAcceleration(Vector2 velocity, Vector2 acceleration) {
-        if (maxAcceleration2 > 0) {
-            acceleration.limit2(maxAcceleration2);
-        }
+    protected void adjustDesiredVelocity() {
+        if (maxVelocity2 > 0)
+            desiredVelocity.limit2(getVelocityLimit());
     }
 }

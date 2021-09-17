@@ -1,5 +1,6 @@
 package com.gordonfromblumberg.games.core.common.physics;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrategy {
@@ -26,6 +27,10 @@ public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrate
         if (calculatedDecelerationDist > decelerationDistance) {
             setDecelerationDistance(calculatedDecelerationDist);
         }
+    }
+
+    public float getDecelerationDistance() {
+        return decelerationDistance;
     }
 
     @Override
@@ -63,5 +68,17 @@ public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrate
 
     protected float calcDecelerationDist() {
         return maxVelocity2 / (2 * maxDeceleration);
+    }
+
+    @Override
+    protected void adjustDesiredVelocity() {
+        float desMovLen2 = desiredMovement.len2();
+        if (decelerationDistance2 > desMovLen2) {
+//            Gdx.app.log("", "decel dist > desired movnt: " + decelerationDistance2 + " > " + desMovLen2);
+            desiredVelocity.setZero();
+//            Gdx.app.log("", "desVelocity = " + desiredVelocity);
+        }
+        else
+            super.adjustDesiredVelocity();
     }
 }

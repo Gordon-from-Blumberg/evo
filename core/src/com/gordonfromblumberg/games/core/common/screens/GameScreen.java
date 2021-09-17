@@ -66,10 +66,11 @@ public class GameScreen extends AbstractScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 // coords don't work
-                coords.x = x;
-                coords.y = y;
-                gameWorld.convertScreenToWorld(coords);
-                creature.setTarget(coords.x, coords.y);
+//                coords.x = x;
+//                coords.y = y;
+//                gameWorld.convertScreenToWorld(coords);
+                Gdx.app.log("Target", "Target = " + x + ", " + y);
+                creature.setTarget(x, y);
             }
         });
     }

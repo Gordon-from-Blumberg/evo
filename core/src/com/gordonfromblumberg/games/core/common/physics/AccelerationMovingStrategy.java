@@ -15,8 +15,7 @@ public class AccelerationMovingStrategy implements MovingStrategy {
 
     @Override
     public void update(Vector2 position, Vector2 velocity, Vector2 acceleration, float dt) {
-        if (maxAcceleration2 > 0)
-            acceleration.limit2(maxAcceleration2);
+        limitAcceleration(velocity, acceleration);
 
         velocity.mulAdd(acceleration, dt);
         if (maxVelocity2 > 0)
@@ -33,5 +32,11 @@ public class AccelerationMovingStrategy implements MovingStrategy {
     public void setMaxAcceleration(float maxAcceleration) {
         this.maxAcceleration = maxAcceleration;
         this.maxAcceleration2 = maxAcceleration * maxAcceleration;
+    }
+
+    protected void limitAcceleration(Vector2 velocity, Vector2 acceleration) {
+        if (maxAcceleration2 > 0) {
+            acceleration.limit2(maxAcceleration2);
+        }
     }
 }

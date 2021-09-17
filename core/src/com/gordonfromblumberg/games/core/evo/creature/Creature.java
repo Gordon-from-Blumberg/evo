@@ -1,5 +1,6 @@
 package com.gordonfromblumberg.games.core.evo.creature;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Pool;
 import com.gordonfromblumberg.games.core.common.model.PhysicsGameObject;
 import com.gordonfromblumberg.games.core.common.physics.ToTargetWithDecelerationMovingStrategy;
@@ -17,6 +18,8 @@ public class Creature extends PhysicsGameObject {
         ToTargetWithDecelerationMovingStrategy str = new ToTargetWithDecelerationMovingStrategy(1000);
         str.setMaxVelocity(200);
         str.setMaxAcceleration(500);
+
+        Gdx.app.log("", "decel dist = " + str.getDecelerationDistance());
 
         movingStrategy = str;
     }
