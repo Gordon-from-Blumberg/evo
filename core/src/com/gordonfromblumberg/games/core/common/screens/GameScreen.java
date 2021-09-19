@@ -27,12 +27,11 @@ public class GameScreen extends AbstractScreen {
     private GameWorld gameWorld;
 
     private final Vector3 coords = new Vector3();
-    private Creature creature;
 
     protected GameScreen(SpriteBatch batch) {
         super(batch);
 
-        color = Color.WHITE;
+        color = Color.GRAY;
     }
 
     @Override
@@ -43,24 +42,19 @@ public class GameScreen extends AbstractScreen {
                 .get("image/texture_pack.atlas", TextureAtlas.class)
                 .findRegion("background");
 
-        gameWorld = new GameWorld(viewport);
+        gameWorld = new GameWorld(viewport, viewport.getWorldHeight(), viewport.getWorldHeight());
 
         createUI();
 
-        stage.addListener(new InputListener() {
-            @Override
-            public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
-                camera.zoom += amountY * 0.25;
-                if (camera.zoom <= 0)
-                    camera.zoom = 0.25f;
-                return true;
-            }
-        });
-
-        creature = Creature.getInstance();
-        creature.setRegion("herbivorous");
-        creature.setPosition(32, 32);
-        creature.setSize(64, 64);
+//        stage.addListener(new InputListener() {
+//            @Override
+//            public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
+//                camera.zoom += amountY * 0.25;
+//                if (camera.zoom <= 0)
+//                    camera.zoom = 0.25f;
+//                return true;
+//            }
+//        });
 
         stage.addListener(new ClickListener() {
             @Override
@@ -70,7 +64,7 @@ public class GameScreen extends AbstractScreen {
 //                coords.y = y;
 //                gameWorld.convertScreenToWorld(coords);
                 Gdx.app.log("Target", "Target = " + x + ", " + y);
-                creature.setTarget(x, y);
+                gameWorld.creature.setTarget(x, y);
             }
         });
     }
@@ -83,24 +77,21 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     protected void update(float delta) {
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            camera.translate(-10, 0);
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            camera.translate(10, 0);
-        if (Gdx.input.isKeyPressed(Input.Keys.UP))
-            camera.translate(0, 10);
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            camera.translate(0, -10);
+//        if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
+//            camera.translate(-10, 0);
+//        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+//            camera.translate(10, 0);
+//        if (Gdx.input.isKeyPressed(Input.Keys.UP))
+//            camera.translate(0, 10);
+//        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
+//            camera.translate(0, -10);
 
         super.update(delta);            // apply camera moving and update batch projection matrix
         gameWorld.update(delta);        // update game state
-        creature.update(delta);
     }
 
     @Override
     protected void renderWorld(float delta) {
-//        batch.draw(background, 0, 0);
-        creature.render(batch);
         gameWorld.render(batch);
     }
 

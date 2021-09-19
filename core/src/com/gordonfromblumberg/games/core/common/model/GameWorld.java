@@ -2,8 +2,9 @@ package com.gordonfromblumberg.games.core.common.model;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
@@ -14,6 +15,7 @@ import com.gordonfromblumberg.games.core.common.event.Event;
 import com.gordonfromblumberg.games.core.common.event.EventProcessor;
 import com.gordonfromblumberg.games.core.common.screens.AbstractScreen;
 import com.gordonfromblumberg.games.core.common.utils.BSPTree;
+import com.gordonfromblumberg.games.core.evo.creature.Creature;
 
 import java.util.Iterator;
 
@@ -21,21 +23,39 @@ public class GameWorld implements Disposable {
 
     private final Viewport viewport;
     private final Array<GameObject> gameObjects = new Array<>();
+    public Creature creature;
 
     private final BSPTree tree;
     private final EventProcessor eventProcessor = new EventProcessor();
 
-    public Rectangle visibleArea;
+    float width, height;
+
+    private NinePatch background;
 
     private int maxCount = 0;
 
     private float time = 0;
     private int score = 0;
 
-    public GameWorld(Viewport viewport) {
+    public GameWorld(Viewport viewport, float worldWidth, float worldHeight) {
         this.viewport = viewport;
-        visibleArea = new Rectangle(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+        width = worldWidth;
+        height = worldHeight;
         tree = new BSPTree(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+        background = new NinePatch(Main.getInstance()
+                .assets()
+                .get("image/texture_pack.atlas", TextureAtlas.class)
+                .findRegion("world-background"),
+                1, 1, 1, 1
+        );
+
+        creature = Creature.getInstance();
+        creature.setRegion("herbivorous");
+        creature.setPosition(32, 32);
+        creature.setSize(64, 64);
+    }
+
+    public void init() {
     }
 
     public void addGameObject(GameObject gameObject) {
@@ -54,8 +74,8 @@ public class GameWorld implements Disposable {
 
     public void update(float delta) {
         time += delta;
-        visibleArea.set(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
         tree.resetAndMove(0, 0);
+        creature.update(delta);
 
         for (GameObject gameObject : gameObjects) {
             gameObject.update(delta);
@@ -75,6 +95,9 @@ public class GameWorld implements Disposable {
     }
 
     public void render(Batch batch) {
+        background.draw(batch, 0, 0, width, height);
+        creature.render(batch);
+
         for (GameObject gameObject : gameObjects) {
             gameObject.render(batch);
         }
@@ -88,21 +111,21 @@ public class GameWorld implements Disposable {
         viewport.unproject(coords);
     }
 
-    public float getMinVisibleX() {
-        return visibleArea.x;
-    }
-
-    public float getMaxVisibleX() {
-        return visibleArea.x + visibleArea.width;
-    }
-
-    public float getMinVisibleY() {
-        return visibleArea.y;
-    }
-
-    public float getMaxVisibleY() {
-        return visibleArea.y + visibleArea.height;
-    }
+//    public float getMinVisibleX() {
+//        return visibleArea.x;
+//    }
+//
+//    public float getMaxVisibleX() {
+//        return visibleArea.x + visibleArea.width;
+//    }
+//
+//    public float getMinVisibleY() {
+//        return visibleArea.y;
+//    }
+//
+//    public float getMaxVisibleY() {
+//        return visibleArea.y + visibleArea.height;
+//    }
 
     public void gameOver() {
         AbstractScreen screen = Main.getInstance().getCurrentScreen();
