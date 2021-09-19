@@ -19,7 +19,7 @@ public class AccelerationMovingStrategy implements MovingStrategy {
 
         velocity.mulAdd(acceleration, dt);
         if (maxVelocity2 > 0)
-                velocity.limit2(maxVelocity2);
+            velocity.limit2(maxVelocity2);
 
         position.mulAdd(velocity, dt);
     }

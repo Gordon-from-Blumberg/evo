@@ -15,13 +15,6 @@ public class Creature extends PhysicsGameObject {
     };
 
     private Creature() {
-        ToTargetWithDecelerationMovingStrategy str = new ToTargetWithDecelerationMovingStrategy(1000);
-        str.setMaxVelocity(200);
-        str.setMaxAcceleration(500);
-
-        Gdx.app.log("", "decel dist = " + str.getDecelerationDistance());
-
-        movingStrategy = str;
     }
 
     public static Creature getInstance() {
@@ -29,6 +22,14 @@ public class Creature extends PhysicsGameObject {
     }
 
     public void setTarget(float x, float y) {
+        if (movingStrategy == null) {
+            ToTargetWithDecelerationMovingStrategy str = new ToTargetWithDecelerationMovingStrategy(200);
+            str.setMaxVelocity(200);
+            str.setMaxAcceleration(100);
+
+            movingStrategy = str;
+        }
+
         ((ToTargetWithDecelerationMovingStrategy) movingStrategy).setTarget(x, y);
     }
 
