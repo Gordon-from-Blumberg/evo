@@ -99,7 +99,7 @@ public abstract class AbstractScreen implements Screen {
         stage.draw();
     }
 
-    private void createWorldViewport(float worldWidth, float minWorldHeight, float maxWorldHeight) {
+    protected void createWorldViewport(float worldWidth, float minWorldHeight, float maxWorldHeight) {
         camera = new OrthographicCamera();
         camera.setToOrtho(false);
         viewport = new ExtendViewport(worldWidth, minWorldHeight, worldWidth, maxWorldHeight, camera);

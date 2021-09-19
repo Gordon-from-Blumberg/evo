@@ -1,23 +1,21 @@
 package com.gordonfromblumberg.games.core.common.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.model.GameWorld;
-import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 import com.gordonfromblumberg.games.core.common.utils.StringUtils;
-import com.gordonfromblumberg.games.core.evo.creature.Creature;
 
 public class GameScreen extends AbstractScreen {
     private static final String LABEL = "Mouse on ";
@@ -46,23 +44,9 @@ public class GameScreen extends AbstractScreen {
 
         createUI();
 
-//        stage.addListener(new InputListener() {
-//            @Override
-//            public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY) {
-//                camera.zoom += amountY * 0.25;
-//                if (camera.zoom <= 0)
-//                    camera.zoom = 0.25f;
-//                return true;
-//            }
-//        });
-
         stage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // coords don't work
-//                coords.x = x;
-//                coords.y = y;
-//                gameWorld.convertScreenToWorld(coords);
                 Gdx.app.log("Target", "Target = " + x + ", " + y);
                 gameWorld.creature.setTarget(x, y);
             }
@@ -77,15 +61,6 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     protected void update(float delta) {
-//        if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-//            camera.translate(-10, 0);
-//        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-//            camera.translate(10, 0);
-//        if (Gdx.input.isKeyPressed(Input.Keys.UP))
-//            camera.translate(0, 10);
-//        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-//            camera.translate(0, -10);
-
         super.update(delta);            // apply camera moving and update batch projection matrix
         gameWorld.update(delta);        // update game state
     }
@@ -100,6 +75,16 @@ public class GameScreen extends AbstractScreen {
         label.setText(getScore());
         super.renderUi();
     }
+
+//    @Override
+//    protected void createWorldViewport(float worldWidth, float minWorldHeight, float maxWorldHeight) {
+//        camera = new OrthographicCamera();
+//        camera.setToOrtho(false);
+//
+//        float worldSize = AbstractFactory.getInstance().configManager().getFloat("game.size");
+//        viewport = new ExtendViewport(worldSize, worldSize, camera);
+//        viewport.update(Gdx.graphics.getHeight(), Gdx.graphics.getHeight(), true);
+//    }
 
     @Override
     public void dispose() {
