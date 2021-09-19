@@ -28,7 +28,7 @@ public class GameWorld implements Disposable {
     private final BSPTree tree;
     private final EventProcessor eventProcessor = new EventProcessor();
 
-    float width, height;
+    public float width, height;
 
     private NinePatch background;
 
@@ -53,6 +53,8 @@ public class GameWorld implements Disposable {
         creature.setRegion("herbivorous");
         creature.setPosition(32, 32);
         creature.setSize(64, 64);
+
+        addGameObject(creature);
     }
 
     public void init() {
@@ -75,7 +77,6 @@ public class GameWorld implements Disposable {
     public void update(float delta) {
         time += delta;
         tree.resetAndMove(0, 0);
-        creature.update(delta);
 
         for (GameObject gameObject : gameObjects) {
             gameObject.update(delta);
@@ -96,7 +97,6 @@ public class GameWorld implements Disposable {
 
     public void render(Batch batch) {
         background.draw(batch, 0, 0, width, height);
-        creature.render(batch);
 
         for (GameObject gameObject : gameObjects) {
             gameObject.render(batch);
