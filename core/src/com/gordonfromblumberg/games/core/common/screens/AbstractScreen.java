@@ -30,14 +30,14 @@ public abstract class AbstractScreen implements Screen {
 
     protected Table uiRootTable;
 
+    protected boolean initialized;
+
     protected AbstractScreen(SpriteBatch batch) {
         this.batch = batch;
     }
 
-    @Override
-    public void show() {
+    protected void initialize() {
         assets = Main.getInstance().assets();
-
         final ConfigManager configManager = AbstractFactory.getInstance().configManager();
         final float worldWidth = configManager.getFloat("worldWidth");
         final float minRatio = configManager.getFloat("minRatio");
@@ -48,11 +48,15 @@ public abstract class AbstractScreen implements Screen {
         createWorldViewport(worldWidth, minWorldHeight, maxWorldHeight);
         createUiViewport(worldWidth, minWorldHeight, maxWorldHeight);
 
-        Gdx.input.setInputProcessor(stage);
+        createUI();
+    }
 
-        uiRootTable = new Table();
-        uiRootTable.setFillParent(true);
-        stage.addActor(uiRootTable);
+    @Override
+    public void show() {
+        if (!initialized) {
+            initialize();
+            initialized = true;
+        }
     }
 
     @Override
@@ -111,6 +115,14 @@ public abstract class AbstractScreen implements Screen {
         uiCamera.setToOrtho(false);
         uiViewport = new ExtendViewport(worldWidth, minWorldHeight, worldWidth, maxWorldHeight, uiCamera);
         stage = new Stage(uiViewport, batch);
+    }
+
+    protected void createUI() {
+        Gdx.input.setInputProcessor(stage);
+
+        uiRootTable = new Table();
+        uiRootTable.setFillParent(true);
+        stage.addActor(uiRootTable);
     }
 
     @Override

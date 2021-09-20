@@ -12,7 +12,6 @@ import com.gordonfromblumberg.games.core.common.Main;
 
 public class MainMenuScreen extends AbstractScreen {
 
-    TextureRegion background;
     TextButton textButton;
 
     public MainMenuScreen(SpriteBatch batch) {
@@ -22,11 +21,13 @@ public class MainMenuScreen extends AbstractScreen {
     }
 
     @Override
-    public void show() {
-        super.show();
+    public void initialize() {
+        super.initialize();
+    }
 
-        final AssetManager assetManager = Main.getInstance().assets();
-//        background = assetManager.get("image/texture_pack.atlas", TextureAtlas.class).findRegion("bg");
+    @Override
+    protected void createUI() {
+        super.createUI();
 
         final Skin uiSkin = assets.get("ui/uiskin.json", Skin.class);
 
@@ -39,15 +40,4 @@ public class MainMenuScreen extends AbstractScreen {
         });
         uiRootTable.add(textButton);
     }
-
-//    @Override
-//    protected void renderWorld(float delta) {
-//        batch.draw(background, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
-//    }
-
-//    @Override
-//    public void dispose() {
-//
-//        super.dispose();
-//    }
 }

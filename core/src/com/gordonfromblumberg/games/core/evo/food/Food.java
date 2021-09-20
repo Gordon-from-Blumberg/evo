@@ -12,12 +12,20 @@ public class Food extends GameObject {
         }
     };
 
-    private Food() {
+    private float value;
 
+    private Food() {
     }
 
     public static Food getInstance() {
         return pool.obtain();
     }
 
+    public float getValue() {
+        return value;
+    }
+
+    public void setValue(float value) {
+        this.value = value;
+    }
 }

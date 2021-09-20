@@ -4,30 +4,29 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.viewport.Viewport;
 
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.event.Event;
 import com.gordonfromblumberg.games.core.common.event.EventProcessor;
 import com.gordonfromblumberg.games.core.common.screens.AbstractScreen;
-import com.gordonfromblumberg.games.core.common.utils.BSPTree;
+import com.gordonfromblumberg.games.core.evo.WorldParams;
 import com.gordonfromblumberg.games.core.evo.creature.Creature;
+import com.gordonfromblumberg.games.core.evo.food.Food;
 
-import java.util.Iterator;
+import static com.gordonfromblumberg.games.core.common.utils.RandomUtils.*;
 
 public class GameWorld implements Disposable {
 
-    private final Viewport viewport;
+    private final WorldParams params = new WorldParams();
     private final Array<GameObject> gameObjects = new Array<>();
+    private final Array<Food> foods = new Array<>();
     public Creature creature;
 
-    private final BSPTree tree;
     private final EventProcessor eventProcessor = new EventProcessor();
 
+    int generation = 1;
     public float width, height;
 
     private NinePatch background;
@@ -37,11 +36,7 @@ public class GameWorld implements Disposable {
     private float time = 0;
     private int score = 0;
 
-    public GameWorld(Viewport viewport, float worldWidth, float worldHeight) {
-        this.viewport = viewport;
-        width = worldWidth;
-        height = worldHeight;
-        tree = new BSPTree(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+    public GameWorld() {
         background = new NinePatch(Main.getInstance()
                 .assets()
                 .get("image/texture_pack.atlas", TextureAtlas.class)
@@ -57,7 +52,26 @@ public class GameWorld implements Disposable {
         addGameObject(creature);
     }
 
-    public void init() {
+    public void generateWorld() {
+        final float fromX = 64;
+        final float toX = width - 64;
+        final float fromY = 64;
+        final float toY = height - 64;
+
+        final int foodCount = nextInt(params.getFoodCountFrom(), params.getFoodCountTo());
+        for (int i = 0; i < foodCount; i++) {
+            Food food = Food.getInstance();
+            food.setValue(nextFloat(params.getFoodValueFrom(), params.getFoodValueTo()));
+            food.setPosition(nextFloat(fromX, toX), nextFloat(fromY, toY));
+            food.setRegion("food");
+            food.setSize(32, 32);
+            addGameObject(food);
+        }
+    }
+
+    public void setSize(float worldSize) {
+        width = worldSize;
+        height = worldSize;
     }
 
     public void addGameObject(GameObject gameObject) {
@@ -76,16 +90,10 @@ public class GameWorld implements Disposable {
 
     public void update(float delta) {
         time += delta;
-        tree.resetAndMove(0, 0);
 
         for (GameObject gameObject : gameObjects) {
             gameObject.update(delta);
-            if (gameObject.active && gameObject.colliding) {
-                tree.addObject(gameObject);
-            }
         }
-
-        detectCollisions();
 
         eventProcessor.process();
 
@@ -101,14 +109,6 @@ public class GameWorld implements Disposable {
         for (GameObject gameObject : gameObjects) {
             gameObject.render(batch);
         }
-    }
-
-    public void convertWorldToScreen(Vector3 coords) {
-        viewport.project(coords);
-    }
-
-    public void convertScreenToWorld(Vector3 coords) {
-        viewport.unproject(coords);
     }
 
 //    public float getMinVisibleX() {
@@ -139,33 +139,6 @@ public class GameWorld implements Disposable {
 
     public void pushEvent(Event event) {
         eventProcessor.push(event);
-    }
-
-    private void detectCollisions() {
-        while (tree.hasNext()) {
-            final Iterator<GameObject> iterator = tree.next();
-            final Iterator<GameObject> internalIterator = tree.internalIterator();
-            while (iterator.hasNext()) {
-                final GameObject gameObject = iterator.next();
-                if (!gameObject.active)
-                    continue;
-
-                while (internalIterator.hasNext()) {
-                    final GameObject internalGameObject = internalIterator.next();
-                    if (!internalGameObject.active)
-                        continue;
-
-                    if (detectCollision(gameObject, internalGameObject)) {
-                        gameObject.collide(internalGameObject);
-                    }
-                }
-            }
-        }
-    }
-
-    private boolean detectCollision(GameObject obj1, GameObject obj2) {
-        return obj1.getBoundingRectangle().overlaps(obj2.getBoundingRectangle())
-                && Intersector.intersectPolygons(obj1.getPolygon(), obj2.getPolygon(), null);
     }
 
     @Override

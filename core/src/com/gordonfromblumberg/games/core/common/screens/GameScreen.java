@@ -21,7 +21,6 @@ public class GameScreen extends AbstractScreen {
     private static final String LABEL = "Mouse on ";
 
     TextureRegion background;
-    private Label label;
     private GameWorld gameWorld;
 
     private final Vector3 coords = new Vector3();
@@ -33,16 +32,16 @@ public class GameScreen extends AbstractScreen {
     }
 
     @Override
-    public void show() {
-        super.show();
+    public void initialize() {
+        super.initialize();
 
         background = Main.getInstance().assets()
                 .get("image/texture_pack.atlas", TextureAtlas.class)
                 .findRegion("background");
 
-        gameWorld = new GameWorld(viewport, viewport.getWorldHeight(), viewport.getWorldHeight());
-
-        createUI();
+        gameWorld = new GameWorld();
+        gameWorld.setSize(viewport.getWorldHeight());
+        gameWorld.generateWorld();
 
         stage.addListener(new ClickListener() {
             @Override
@@ -72,7 +71,6 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     protected void renderUi() {
-        label.setText(getScore());
         super.renderUi();
     }
 
@@ -93,19 +91,12 @@ public class GameScreen extends AbstractScreen {
         super.dispose();
     }
 
-    private void createUI() {
+    @Override
+    protected void createUI() {
+        super.createUI();
+
         final Skin uiSkin = assets.get("ui/uiskin.json", Skin.class);
 
-        label = new Label(getScore(), uiSkin);
-        uiRootTable.add(label).left();
-        uiRootTable.row().expand();
-        uiRootTable.add();
-    }
 
-    private String getScore() {
-        coords.x = Gdx.input.getX();
-        coords.y = Gdx.input.getY();
-        gameWorld.convertScreenToWorld(coords);
-        return StringUtils.format("##, #", LABEL, coords.x, coords.y);
     }
 }
