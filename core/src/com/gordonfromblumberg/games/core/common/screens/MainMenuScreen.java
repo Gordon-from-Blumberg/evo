@@ -21,8 +21,16 @@ public class MainMenuScreen extends AbstractScreen {
     }
 
     @Override
-    public void initialize() {
-        super.initialize();
+    public void resize(int width, int height) {
+        uiViewport.update(width, height, true);
+    }
+
+    @Override
+    protected void update(float delta) {
+    }
+
+    @Override
+    protected void createWorldViewport(float worldWidth, float minWorldHeight, float maxWorldHeight) {
     }
 
     @Override
