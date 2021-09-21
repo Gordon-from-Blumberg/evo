@@ -7,10 +7,12 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.model.GameWorld;
+import com.gordonfromblumberg.games.core.evo.event.NewGenerationEvent;
 
 public class GameScreen extends AbstractScreen {
     private static final String LABEL = "Mouse on ";
@@ -65,21 +67,6 @@ public class GameScreen extends AbstractScreen {
     }
 
     @Override
-    protected void renderUi() {
-        super.renderUi();
-    }
-
-//    @Override
-//    protected void createWorldViewport(float worldWidth, float minWorldHeight, float maxWorldHeight) {
-//        camera = new OrthographicCamera();
-//        camera.setToOrtho(false);
-//
-//        float worldSize = AbstractFactory.getInstance().configManager().getFloat("game.size");
-//        viewport = new ExtendViewport(worldSize, worldSize, camera);
-//        viewport.update(Gdx.graphics.getHeight(), Gdx.graphics.getHeight(), true);
-//    }
-
-    @Override
     public void dispose() {
         gameWorld.dispose();
 
@@ -92,6 +79,10 @@ public class GameScreen extends AbstractScreen {
 
         final Skin uiSkin = assets.get("ui/uiskin.json", Skin.class);
 
-
+        Label label = new Label("Generation #1", uiSkin);
+        gameWorld.registerHandler("newGeneration", e -> {
+            label.setText("Generation #" + ((NewGenerationEvent) e).getGenerationNumber());
+            return false;
+        });
     }
 }

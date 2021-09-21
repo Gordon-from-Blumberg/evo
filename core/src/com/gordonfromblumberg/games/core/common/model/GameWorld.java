@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Disposable;
 
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.event.Event;
+import com.gordonfromblumberg.games.core.common.event.EventHandler;
 import com.gordonfromblumberg.games.core.common.event.EventProcessor;
 import com.gordonfromblumberg.games.core.common.screens.AbstractScreen;
 import com.gordonfromblumberg.games.core.evo.WorldParams;
@@ -159,8 +160,8 @@ public class GameWorld implements Disposable {
         screen.dispose();
     }
 
-    public int getScore() {
-        return score;
+    public void registerHandler(String type, EventHandler handler) {
+        eventProcessor.registerHandler(type, handler);
     }
 
     public void pushEvent(Event event) {
