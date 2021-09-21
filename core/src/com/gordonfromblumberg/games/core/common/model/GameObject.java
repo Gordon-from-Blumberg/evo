@@ -143,9 +143,9 @@ public class GameObject implements Disposable, Pool.Poolable {
 
     @Override
     public void reset() {
+        id = -1;
         setPosition(0, 0);
         polygon.setRotation(0);
-        gameWorld.removeGameObject(this);
     }
 
     @Override

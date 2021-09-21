@@ -20,7 +20,7 @@ import static com.gordonfromblumberg.games.core.common.utils.RandomUtils.*;
 public class GameWorld implements Disposable {
 
     private final WorldParams params = new WorldParams();
-    private final Array<GameObject> gameObjects = new Array<>();
+    private final Array<Creature> creatures = new Array<>();
     private final Array<Food> foods = new Array<>();
     public Creature creature;
 
@@ -31,7 +31,8 @@ public class GameWorld implements Disposable {
 
     private NinePatch background;
 
-    private int maxCount = 0;
+    private int maxCreatureCount = 0;
+    private int maxFoodCount = 0;
 
     private float time = 0;
     private int score = 0;
@@ -49,10 +50,12 @@ public class GameWorld implements Disposable {
         creature.setPosition(32, 32);
         creature.setSize(64, 64);
 
-        addGameObject(creature);
+        addCreature(creature);
     }
 
-    public void generateWorld() {
+    public void generateFood() {
+        foods.clear();
+
         final float fromX = 64;
         final float toX = width - 64;
         final float fromY = 64;
@@ -65,7 +68,7 @@ public class GameWorld implements Disposable {
             food.setPosition(nextFloat(fromX, toX), nextFloat(fromY, toY));
             food.setRegion("food");
             food.setSize(32, 32);
-            addGameObject(food);
+            addFood(food);
         }
     }
 
@@ -74,40 +77,63 @@ public class GameWorld implements Disposable {
         height = worldSize;
     }
 
-    public void addGameObject(GameObject gameObject) {
-        gameObjects.add(gameObject);
-        gameObject.setGameWorld(this);
-        gameObject.active = true;
-        gameObject.id = GameObject.nextId++;
-        if (gameObjects.size > maxCount) maxCount = gameObjects.size;
+    public void addFood(Food food) {
+        foods.add(food);
+        food.setGameWorld(this);
+        food.active = true;
+        food.id = GameObject.nextId++;
+        if (foods.size > maxFoodCount) maxFoodCount = creatures.size;
     }
 
-    public void removeGameObject(GameObject gameObject) {
-        gameObjects.removeValue(gameObject, true);
-        gameObject.setGameWorld(null);
-        gameObject.active = false;
+    public void addCreature(Creature creature) {
+        creatures.add(creature);
+        creature.setGameWorld(this);
+        creature.active = true;
+        creature.id = GameObject.nextId++;
+        if (creatures.size > maxCreatureCount) maxCreatureCount = creatures.size;
+    }
+
+    public void removeFood(Food food) {
+        foods.removeValue(food, true);
+        food.setGameWorld(null);
+        food.active = false;
+        food.release();
+    }
+
+    public void removeCreature(Creature creature) {
+        creatures.removeValue(creature, true);
+        creature.setGameWorld(null);
+        creature.active = false;
+        creature.release();
     }
 
     public void update(float delta) {
         time += delta;
 
-        for (GameObject gameObject : gameObjects) {
-            gameObject.update(delta);
+        for (Food food : foods)
+            food.update(delta);
+
+        for (Creature creature : creatures) {
+            creature.update(delta);
         }
 
         eventProcessor.process();
 
         if (time > 2) {
             time = 0;
-            Gdx.app.log("GameWorld", gameObjects.size + " objects in the world of maximum " + maxCount);
+            Gdx.app.log("GameWorld", "Creatures: current count = " + creatures.size + ", max count = " + maxCreatureCount);
+            Gdx.app.log("GameWorld", "Foods: current count = " + foods.size + ", max count = " + maxFoodCount);
         }
     }
 
     public void render(Batch batch) {
         background.draw(batch, 0, 0, width, height);
 
-        for (GameObject gameObject : gameObjects) {
-            gameObject.render(batch);
+        for (Food food : foods)
+            food.render(batch);
+
+        for (Creature creature : creatures) {
+            creature.render(batch);
         }
     }
 
@@ -143,7 +169,7 @@ public class GameWorld implements Disposable {
 
     @Override
     public void dispose() {
-        for (GameObject gameObject : gameObjects) {
+        for (GameObject gameObject : creatures) {
             gameObject.dispose();
         }
     }

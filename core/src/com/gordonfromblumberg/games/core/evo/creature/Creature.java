@@ -22,6 +22,10 @@ public class Creature extends PhysicsGameObject {
         return pool.obtain();
     }
 
+    public void release() {
+        pool.free(this);
+    }
+
     public void setTarget(float x, float y) {
         if (movingStrategy == null) {
             ToTargetWithDecelerationMovingStrategy str = new ToTargetWithDecelerationMovingStrategy(200);

@@ -21,6 +21,10 @@ public class Food extends GameObject {
         return pool.obtain();
     }
 
+    public void release() {
+        pool.free(this);
+    }
+
     public float getValue() {
         return value;
     }
