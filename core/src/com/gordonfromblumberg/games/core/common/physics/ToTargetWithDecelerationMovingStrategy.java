@@ -58,7 +58,7 @@ public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrate
         float desMovLen2 = desiredMovement.len2();
         float desVelocityToVelocityAngle = desiredVelocity.angleDeg(velocity);
         boolean decelerate = acceleration.dot(velocity) < 0
-                && (desVelocityToVelocityAngle < 5 || desVelocityToVelocityAngle > 355);
+                && (desVelocityToVelocityAngle < 10 || desVelocityToVelocityAngle > 350);
 
         if (decelerate) {
             float velocity2 = velocity.len2();

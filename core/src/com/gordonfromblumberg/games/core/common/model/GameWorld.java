@@ -21,7 +21,7 @@ import static com.gordonfromblumberg.games.core.common.utils.RandomUtils.*;
 
 public class GameWorld implements Disposable {
 
-    private final WorldParams params = new WorldParams();
+    public final WorldParams params = new WorldParams();
     private final Array<Creature> creatures = new Array<>();
     private final Array<Food> foods = new Array<>();
     public Creature creature;
@@ -37,7 +37,6 @@ public class GameWorld implements Disposable {
     private int maxFoodCount = 0;
 
     private float time = 0;
-    private int score = 0;
 
     public GameWorld() {
         background = new NinePatch(Main.getInstance()
@@ -97,7 +96,7 @@ public class GameWorld implements Disposable {
         food.setGameWorld(this);
         food.active = true;
         food.id = GameObject.nextId++;
-        if (foods.size > maxFoodCount) maxFoodCount = creatures.size;
+        if (foods.size > maxFoodCount) maxFoodCount = foods.size;
     }
 
     public void addCreature(Creature creature) {

@@ -26,7 +26,7 @@ public class ToTargetMovingStrategy extends AccelerationMovingStrategy {
         desiredMovement.set(target).sub(position);
         desiredVelocity.set(desiredMovement);
         adjustDesiredVelocity(velocity);
-        acceleration.set(desiredVelocity).sub(velocity);
+        acceleration.set(desiredVelocity).sub(velocity).scl(20);
         super.update(position, velocity, acceleration, dt);
     }
 

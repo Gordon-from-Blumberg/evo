@@ -123,6 +123,9 @@ public abstract class AbstractScreen implements Screen {
         uiRootTable = new Table();
         uiRootTable.setFillParent(true);
         stage.addActor(uiRootTable);
+
+        if (Main.DEBUG_UI)
+            uiRootTable.debugAll();
     }
 
     @Override

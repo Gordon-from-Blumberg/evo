@@ -15,6 +15,9 @@ import com.gordonfromblumberg.games.core.common.utils.JsonConfigLoader;
 import java.util.function.Consumer;
 
 public class Main extends Game {
+	public static boolean DEBUG;
+	public static boolean DEBUG_UI;
+
 	private static Main instance;
 
 	public static final String NAME = "Evo";
