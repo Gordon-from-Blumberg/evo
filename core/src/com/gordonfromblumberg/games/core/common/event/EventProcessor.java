@@ -31,10 +31,14 @@ public class EventProcessor {
         while (queue.notEmpty()) {
             final Event event = queue.removeFirst();
             final Array<EventHandler> handlerList = handlers.get(event.getType());
-            if (handlerList != null)
-                for (EventHandler handler : handlerList)
-                    if (handler.handle(event))
+            if (handlerList != null) {
+                for (EventHandler handler : handlerList) {
+                    if (handler.handle(event)) {
                         break;
+                    }
+                }
+            }
+            event.release();
         }
     }
 }

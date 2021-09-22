@@ -17,7 +17,7 @@ import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 
 public abstract class AbstractScreen implements Screen {
 
-    private static final float MIN_DELTA = 1.0f / 30;
+    private static final float MAX_DELTA = 1.0f / 30;
 
     protected AssetManager assets;
 
@@ -61,7 +61,7 @@ public abstract class AbstractScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        delta = Math.min(delta, MIN_DELTA);
+        delta = Math.min(delta, MAX_DELTA);
 
         Gdx.gl.glClearColor(color.r, color.g, color.b, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);

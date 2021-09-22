@@ -14,6 +14,7 @@ import com.gordonfromblumberg.games.core.common.event.EventProcessor;
 import com.gordonfromblumberg.games.core.common.screens.AbstractScreen;
 import com.gordonfromblumberg.games.core.evo.WorldParams;
 import com.gordonfromblumberg.games.core.evo.creature.Creature;
+import com.gordonfromblumberg.games.core.evo.event.NewGenerationEvent;
 import com.gordonfromblumberg.games.core.evo.food.Food;
 
 import static com.gordonfromblumberg.games.core.common.utils.RandomUtils.*;
@@ -27,7 +28,7 @@ public class GameWorld implements Disposable {
 
     private final EventProcessor eventProcessor = new EventProcessor();
 
-    int generation = 1;
+    int generation;
     public float width, height;
 
     private NinePatch background;
@@ -54,7 +55,20 @@ public class GameWorld implements Disposable {
         addCreature(creature);
     }
 
+    public void newGeneration() {
+        generation++;
+        generateFood();
+        NewGenerationEvent event = NewGenerationEvent.getInstance();
+        event.setGenerationNumber(generation);
+        eventProcessor.push(event);
+    }
+
     public void generateFood() {
+        for (Food food : foods) {
+            food.setGameWorld(null);
+            food.active = false;
+            food.release();
+        }
         foods.clear();
 
         final float fromX = 64;
@@ -110,6 +124,8 @@ public class GameWorld implements Disposable {
 
     public void update(float delta) {
         time += delta;
+
+//        newGeneration();
 
         for (Food food : foods)
             food.update(delta);

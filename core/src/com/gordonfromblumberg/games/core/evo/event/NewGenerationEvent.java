@@ -27,7 +27,7 @@ public class NewGenerationEvent implements Event {
 
     @Override
     public String getType() {
-        return "newGeneration";
+        return "NewGeneration";
     }
 
     public int getGenerationNumber() {

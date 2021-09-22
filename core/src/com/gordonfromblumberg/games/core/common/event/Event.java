@@ -1,7 +1,7 @@
 package com.gordonfromblumberg.games.core.common.event;
 
-import com.badlogic.gdx.utils.Pool;
+import com.gordonfromblumberg.games.core.common.utils.Poolable;
 
-public interface Event extends Pool.Poolable {
+public interface Event extends Poolable {
     String getType();
 }

@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.model.GameWorld;
 import com.gordonfromblumberg.games.core.evo.event.NewGenerationEvent;
@@ -26,6 +27,7 @@ public class GameScreen extends AbstractScreen {
         super(batch);
 
         color = Color.GRAY;
+        gameWorld = new GameWorld();
     }
 
     @Override
@@ -36,9 +38,8 @@ public class GameScreen extends AbstractScreen {
                 .get("image/texture_pack.atlas", TextureAtlas.class)
                 .findRegion("background");
 
-        gameWorld = new GameWorld();
         gameWorld.setSize(viewport.getWorldHeight());
-        gameWorld.generateFood();
+        gameWorld.newGeneration();
 
         stage.addListener(new ClickListener() {
             @Override
@@ -76,13 +77,22 @@ public class GameScreen extends AbstractScreen {
     @Override
     protected void createUI() {
         super.createUI();
+        uiRootTable.setFillParent(false);
+        uiRootTable.setWidth(viewport.getWorldWidth() - viewport.getWorldHeight());
+        uiRootTable.setX(viewport.getWorldHeight());
+        uiRootTable.setY(500);
+        uiRootTable.debugAll();
 
         final Skin uiSkin = assets.get("ui/uiskin.json", Skin.class);
 
-        Label label = new Label("Generation #1", uiSkin);
-        gameWorld.registerHandler("newGeneration", e -> {
+        Label label = new Label("", uiSkin);
+        gameWorld.registerHandler("NewGeneration", e -> {
             label.setText("Generation #" + ((NewGenerationEvent) e).getGenerationNumber());
             return false;
         });
+        uiRootTable.add(label).align(Align.center);
+
+        uiRootTable.row();
+        uiRootTable.add(new Label("FOOD", uiSkin));
     }
 }
