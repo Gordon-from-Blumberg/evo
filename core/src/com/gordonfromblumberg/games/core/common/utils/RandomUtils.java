@@ -9,6 +9,10 @@ public class RandomUtils {
         return from == to ? from : from + RAND.nextInt(to - from);
     }
 
+    public static float nextFloat(float max) {
+        return max * RAND.nextFloat();
+    }
+
     public static float nextFloat(float from, float to) {
         return from == to ? from : from + ((to - from) * RAND.nextFloat());
     }

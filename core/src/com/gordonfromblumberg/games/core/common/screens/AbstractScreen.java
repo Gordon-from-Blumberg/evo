@@ -38,15 +38,9 @@ public abstract class AbstractScreen implements Screen {
 
     protected void initialize() {
         assets = Main.getInstance().assets();
-        final ConfigManager configManager = AbstractFactory.getInstance().configManager();
-        final float worldWidth = configManager.getFloat("worldWidth");
-        final float minRatio = configManager.getFloat("minRatio");
-        final float maxRatio = configManager.getFloat("maxRatio");
-        final float minWorldHeight = worldWidth / maxRatio;
-        final float maxWorldHeight = worldWidth / minRatio;
 
-        createWorldViewport(worldWidth, minWorldHeight, maxWorldHeight);
-        createUiViewport(worldWidth, minWorldHeight, maxWorldHeight);
+        createWorldViewport();
+        createUiViewport();
 
         createUI();
     }
@@ -103,14 +97,26 @@ public abstract class AbstractScreen implements Screen {
         stage.draw();
     }
 
-    protected void createWorldViewport(float worldWidth, float minWorldHeight, float maxWorldHeight) {
+    protected void createWorldViewport() {
+        final ConfigManager configManager = AbstractFactory.getInstance().configManager();
+        final float worldWidth = configManager.getFloat("worldWidth");
+        final float minRatio = configManager.getFloat("minRatio");
+        final float maxRatio = configManager.getFloat("maxRatio");
+        final float minWorldHeight = worldWidth / maxRatio;
+        final float maxWorldHeight = worldWidth / minRatio;
         camera = new OrthographicCamera();
         camera.setToOrtho(false);
         viewport = new ExtendViewport(worldWidth, minWorldHeight, worldWidth, maxWorldHeight, camera);
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
 
-    private void createUiViewport(float worldWidth, float minWorldHeight, float maxWorldHeight) {
+    private void createUiViewport() {
+        final ConfigManager configManager = AbstractFactory.getInstance().configManager();
+        final float worldWidth = configManager.getFloat("worldWidth");
+        final float minRatio = configManager.getFloat("minRatio");
+        final float maxRatio = configManager.getFloat("maxRatio");
+        final float minWorldHeight = worldWidth / maxRatio;
+        final float maxWorldHeight = worldWidth / minRatio;
         uiCamera = new OrthographicCamera();
         uiCamera.setToOrtho(false);
         uiViewport = new ExtendViewport(worldWidth, minWorldHeight, worldWidth, maxWorldHeight, uiCamera);

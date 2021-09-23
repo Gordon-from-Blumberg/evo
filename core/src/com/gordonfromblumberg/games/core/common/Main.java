@@ -17,10 +17,10 @@ import java.util.function.Consumer;
 public class Main extends Game {
 	public static boolean DEBUG;
 	public static boolean DEBUG_UI;
+	public static float CREATURE_SIZE;
+	public static final String NAME = "Evo";
 
 	private static Main instance;
-
-	public static final String NAME = "Evo";
 
 	private final AssetManager assetManager;
 	private ConfigManager configManager;

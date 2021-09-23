@@ -2,9 +2,11 @@ package com.gordonfromblumberg.games.core.evo.creature;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool;
 import com.gordonfromblumberg.games.core.common.model.PhysicsGameObject;
 import com.gordonfromblumberg.games.core.evo.physics.CreatureMovingStrategy;
+import com.gordonfromblumberg.games.core.evo.state.State;
 
 public class Creature extends PhysicsGameObject {
 
@@ -14,6 +16,10 @@ public class Creature extends PhysicsGameObject {
             return new Creature();
         }
     };
+
+    private final IntMap[] stateParams = new IntMap[State.values().length];
+
+    private State state = State.WAITING;
 
     private Creature() {
         movingStrategy = new CreatureMovingStrategy();
@@ -25,6 +31,12 @@ public class Creature extends PhysicsGameObject {
 
     public void release() {
         pool.free(this);
+    }
+
+    @Override
+    public void update(float delta) {
+        state.update(this, delta);
+        super.update(delta);
     }
 
     public void setTarget(float x, float y) {
@@ -99,5 +111,18 @@ public class Creature extends PhysicsGameObject {
 
     public void setDecelerationDist(float value) {
         ((CreatureMovingStrategy) movingStrategy).setDecelerationDistance(value);
+    }
+
+    public void setState(State state) {
+        if (this.state != state) {
+            this.state = state;
+            state.enter(this);
+        }
+    }
+
+    public IntMap<Object> getStateParams(State state) {
+        if (stateParams[state.ordinal()] == null)
+            stateParams[state.ordinal()] = new IntMap<>();
+        return stateParams[state.ordinal()];
     }
 }

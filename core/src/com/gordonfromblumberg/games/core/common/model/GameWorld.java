@@ -50,32 +50,32 @@ public class GameWorld implements Disposable {
     }
 
     public void initialize(float size) {
+        final float baseSize = Main.CREATURE_SIZE;
+
         setSize(size);
 
         herb = Creature.getInstance();
         herb.setRegion("herbivorous");
-        herb.setPosition(32, 32);
-        herb.setSize(64, 64);
-        herb.setMaxVelocityForward(300);
-        herb.setMaxVelocityBackward(150);
-        herb.setMaxAngleVelocity(170);
+        herb.setPosition(baseSize / 2, baseSize / 2);
+        herb.setSize(baseSize, baseSize);
+        herb.setMaxVelocityForward(baseSize * 5);
+        herb.setMaxVelocityBackward(baseSize * 2);
+        herb.setMaxAngleVelocity(180);
         herb.setMaxRotation(250);
-        herb.setMaxAcceleration(300);
-        herb.setMaxDeceleration(380);
-
-//        herb.setDecelerationDist(50);
+        herb.setMaxAcceleration(baseSize * 4.5f);
+        herb.setMaxDeceleration(baseSize * 5.5f);
         addCreature(herb);
 
         pred = Creature.getInstance();
         pred.setRegion("predator");
-        pred.setPosition(size - 32, 32);
-        pred.setSize(64, 64);
-        pred.setMaxVelocityForward(320);
-        pred.setMaxVelocityBackward(100);
-        pred.setMaxAngleVelocity(120);
-        pred.setMaxRotation(200);
-        pred.setMaxAcceleration(350);
-        pred.setMaxDeceleration(420);
+        pred.setPosition(size - baseSize / 2, baseSize / 2);
+        pred.setSize(baseSize, baseSize);
+        pred.setMaxVelocityForward(baseSize * 5.5f);
+        pred.setMaxVelocityBackward(baseSize * 2);
+        pred.setMaxAngleVelocity(110);
+        pred.setMaxRotation(180);
+        pred.setMaxAcceleration(baseSize * 5);
+        pred.setMaxDeceleration(baseSize * 6.5f);
         addCreature(pred);
     }
 
@@ -106,7 +106,7 @@ public class GameWorld implements Disposable {
             food.setValue(nextFloat(params.getFoodValueFrom(), params.getFoodValueTo()));
             food.setPosition(nextFloat(fromX, toX), nextFloat(fromY, toY));
             food.setRegion("food");
-            food.setSize(32, 32);
+            food.setSize(0.5f, 0.5f);
             addFood(food);
         }
     }
@@ -172,7 +172,7 @@ public class GameWorld implements Disposable {
     }
 
     public void render(Batch batch) {
-        background.draw(batch, 0, 0, width, height);
+        background.draw(batch, 0, 0, 0, 0, 64 * width, 64 * height, 1f/64, 1f/64, 0);
 
         for (Food food : foods)
             food.render(batch);

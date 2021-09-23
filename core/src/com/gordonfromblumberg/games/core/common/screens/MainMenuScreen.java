@@ -30,7 +30,7 @@ public class MainMenuScreen extends AbstractScreen {
     }
 
     @Override
-    protected void createWorldViewport(float worldWidth, float minWorldHeight, float maxWorldHeight) {
+    protected void createWorldViewport() {
     }
 
     @Override

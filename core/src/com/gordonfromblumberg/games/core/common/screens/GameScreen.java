@@ -2,6 +2,7 @@ package com.gordonfromblumberg.games.core.common.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -10,15 +11,16 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.gordonfromblumberg.games.core.common.Main;
+import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.model.GameWorld;
 import com.gordonfromblumberg.games.core.common.ui.FloatField;
 import com.gordonfromblumberg.games.core.common.ui.IntField;
+import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 import com.gordonfromblumberg.games.core.evo.event.NewGenerationEvent;
 
 public class GameScreen extends AbstractScreen {
-    private static final String LABEL = "Mouse on ";
-
     TextureRegion background;
     private GameWorld gameWorld;
 
@@ -52,6 +54,21 @@ public class GameScreen extends AbstractScreen {
     }
 
     @Override
+    protected void createWorldViewport() {
+        final ConfigManager configManager = AbstractFactory.getInstance().configManager();
+        Main.CREATURE_SIZE = configManager.getFloat("game.creature.size");
+        final float worldWidth = configManager.getFloat("game.size") * Main.CREATURE_SIZE;
+        final float minRatio = configManager.getFloat("minRatio");
+        final float maxRatio = configManager.getFloat("maxRatio");
+        final float minWorldHeight = worldWidth / maxRatio;
+        final float maxWorldHeight = worldWidth / minRatio;
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false);
+        viewport = new ExtendViewport(worldWidth, minWorldHeight, worldWidth, maxWorldHeight, camera);
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+    }
+
+    @Override
     public void resize(int width, int height) {
         viewport.update(width, height, false);
         uiViewport.update(width, height, true);
@@ -79,8 +96,10 @@ public class GameScreen extends AbstractScreen {
     protected void createUI() {
         super.createUI();
         uiRootTable.setFillParent(false);
-        uiRootTable.setWidth(viewport.getWorldWidth() - viewport.getWorldHeight());
-        uiRootTable.setX(viewport.getWorldHeight());
+        uiRootTable.setWidth(viewport.getScreenWidth() - viewport.getScreenHeight());
+        Gdx.app.log("UI", "uiRootTable width = " + (viewport.getScreenWidth() - viewport.getScreenHeight()));
+        uiRootTable.setX(viewport.getScreenHeight());
+        Gdx.app.log("UI", "uiRootTable x = " + viewport.getScreenHeight());
         uiRootTable.setY(500);
 
         final Skin uiSkin = assets.get("ui/uiskin.json", Skin.class);
