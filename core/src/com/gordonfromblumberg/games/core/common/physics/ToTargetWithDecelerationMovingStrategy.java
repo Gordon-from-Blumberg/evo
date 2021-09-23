@@ -5,12 +5,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 
 public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrategy {
-    protected static final float DELTA = AbstractFactory.getInstance().configManager().getFloat("delta");
-
     protected float decelerationDistance, decelerationDistance2;
     protected float maxDeceleration, maxDeceleration2;
 
-    protected float delta2 = DELTA * DELTA;
+    protected float targetVelocityLimit2 = 0.1f;
+    protected float targetRadius2 = 0.1f;
     protected boolean targetReached;
 
     public ToTargetWithDecelerationMovingStrategy() {}
@@ -91,7 +90,7 @@ public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrate
     protected void adjustDesiredVelocity(Vector2 velocity) {
         float desMovLen2 = desiredMovement.len2();
 
-        if (desMovLen2 <= delta2 && velocity.len2() <= delta2)
+        if (desMovLen2 <= targetRadius2 && velocity.len2() <= targetVelocityLimit2)
             targetReached = true;
 
         if (desMovLen2 < decelerationDistance2) {
