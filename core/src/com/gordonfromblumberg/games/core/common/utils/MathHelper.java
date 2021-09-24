@@ -13,4 +13,11 @@ public class MathHelper {
     public static float smoothStep(float f) {
         return f * f * (3.0f - 2.0f * f);
     }
+
+    public static float clampAngleDeg(float deg) {
+        deg %= 360;
+        if (deg > 180) deg -= 360;
+        else if (deg < -180) deg += 360;
+        return deg;
+    }
 }

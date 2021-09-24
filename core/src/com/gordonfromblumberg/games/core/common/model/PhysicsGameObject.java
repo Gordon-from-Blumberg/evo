@@ -11,6 +11,8 @@ public class PhysicsGameObject extends GameObject {
 
     protected boolean turnInVelocityDirection = true;
 
+    protected float angleVelocity = -360*0.5f;
+
     {
         this.colliding = true;
     }
@@ -24,17 +26,19 @@ public class PhysicsGameObject extends GameObject {
         if (movingStrategy != null)
             movingStrategy.update(position, velocity, acceleration, delta);
 
-        rotate();
+        rotate(delta);
 
         adjustPosition();
         polygon.setPosition(position.x, position.y);
     }
 
-    protected void rotate() {
+    protected void rotate(float delta) {
         if (turnInVelocityDirection)
             // vector 0 deg - right
             // sprite / polygon 0 deg - top
             setRotation(velocity.angleDeg() - 90);
+
+        setRotation(polygon.getRotation() + angleVelocity * delta);
     }
 
     /**
