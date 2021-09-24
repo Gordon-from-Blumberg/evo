@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
 import com.gordonfromblumberg.games.core.common.model.PhysicsGameObject;
-import com.gordonfromblumberg.games.core.common.physics.ToTargetWithDecelerationMovingStrategy;
+import com.gordonfromblumberg.games.core.evo.physics.CreatureMovingStrategy;
 
 public class Creature extends PhysicsGameObject {
 
@@ -28,21 +28,16 @@ public class Creature extends PhysicsGameObject {
 
     public void setTarget(float x, float y) {
         if (movingStrategy == null) {
-            ToTargetWithDecelerationMovingStrategy str = new ToTargetWithDecelerationMovingStrategy(200);
-            str.setMaxVelocity(200);
-            str.setMaxAcceleration(100);
-
+            CreatureMovingStrategy str = new CreatureMovingStrategy();
+            str.setMaxVelocity(1000);
+            str.setMaxAcceleration(500);
+            str.setMaxDeceleration(500);
+            str.setDecelerationDistance(100);
+            Gdx.app.log("Dec dist", String.valueOf(str.getDecelerationDistance()));
             movingStrategy = str;
         }
 
-        ((ToTargetWithDecelerationMovingStrategy) movingStrategy).setTarget(x, y);
-    }
-
-    @Override
-    public void update(float delta) {
-        super.update(delta);
-
-        sprite.setRotation(velocity.angleDeg());
+        ((CreatureMovingStrategy) movingStrategy).setTarget(x, y);
     }
 
     @Override

@@ -5,4 +5,8 @@ import com.gordonfromblumberg.games.core.common.physics.ToTargetWithDeceleration
 public class CreatureMovingStrategy extends ToTargetWithDecelerationMovingStrategy {
     private float maxVelocityForward, maxVelocityBackward;
     private float maxAngleVelocity;
+
+    public CreatureMovingStrategy() {
+        friction = 0.96f;
+    }
 }

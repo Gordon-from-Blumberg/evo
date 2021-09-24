@@ -37,7 +37,7 @@ public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrate
         super.setMaxVelocity(maxVelocity);
 
         float calculatedDecelerationDist = calcDecelerationDist();
-        if (calculatedDecelerationDist > decelerationDistance) {
+        if (calculatedDecelerationDist > decelerationDistance && calculatedDecelerationDist < Float.MAX_VALUE) {
             setDecelerationDistance(calculatedDecelerationDist);
         }
     }
@@ -67,17 +67,17 @@ public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrate
         }
     }
 
-    protected void setMaxDeceleration(float maxDeceleration) {
+    public void setMaxDeceleration(float maxDeceleration) {
         this.maxDeceleration = maxDeceleration;
         this.maxDeceleration2 = maxDeceleration * maxDeceleration;
 
         float calculatedDecelerationDist = calcDecelerationDist();
-        if (calculatedDecelerationDist > decelerationDistance) {
+        if (calculatedDecelerationDist > decelerationDistance && calculatedDecelerationDist < Float.MAX_VALUE) {
             setDecelerationDistance(calculatedDecelerationDist);
         }
     }
 
-    protected void setDecelerationDistance(float decelerationDistance) {
+    public void setDecelerationDistance(float decelerationDistance) {
         this.decelerationDistance = decelerationDistance;
         this.decelerationDistance2 = decelerationDistance * decelerationDistance;
     }

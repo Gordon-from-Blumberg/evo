@@ -1,10 +1,12 @@
 package com.gordonfromblumberg.games.core.common.physics;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 public class AccelerationMovingStrategy implements MovingStrategy {
     protected float maxVelocity, maxVelocity2;
     protected float maxAcceleration, maxAcceleration2;
+    protected float friction = 1f;
 
     public AccelerationMovingStrategy() {}
 
@@ -22,6 +24,10 @@ public class AccelerationMovingStrategy implements MovingStrategy {
             velocity.limit2(maxVelocity2);
 
         position.mulAdd(velocity, dt);
+//        Gdx.app.log("Position", position + ", mag = " + position.len());
+//        Gdx.app.log("Velocity", velocity + ", mag = " + velocity.len());
+//        Gdx.app.log("Acceleration", acceleration + ", mag = " + acceleration.len());
+        velocity.scl(friction);
     }
 
     public void setMaxVelocity(float maxVelocity) {

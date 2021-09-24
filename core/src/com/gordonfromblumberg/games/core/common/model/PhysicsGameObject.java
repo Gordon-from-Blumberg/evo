@@ -1,8 +1,6 @@
 package com.gordonfromblumberg.games.core.common.model;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Pool;
 import com.gordonfromblumberg.games.core.common.physics.MovingStrategy;
 
 public class PhysicsGameObject extends GameObject {
@@ -19,11 +17,6 @@ public class PhysicsGameObject extends GameObject {
 
     public PhysicsGameObject() {}
 
-    @SuppressWarnings("rawtypes")
-    public PhysicsGameObject(Pool pool) {
-        super(pool);
-    }
-
     @Override
     public void update(final float delta) {
         super.update(delta);
@@ -31,13 +24,17 @@ public class PhysicsGameObject extends GameObject {
         if (movingStrategy != null)
             movingStrategy.update(position, velocity, acceleration, delta);
 
+        rotate();
+
+        adjustPosition();
+        polygon.setPosition(position.x, position.y);
+    }
+
+    protected void rotate() {
         if (turnInVelocityDirection)
             // vector 0 deg - right
             // sprite / polygon 0 deg - top
             setRotation(velocity.angleDeg() - 90);
-
-        adjustPosition();
-        polygon.setPosition(position.x, position.y);
     }
 
     /**
