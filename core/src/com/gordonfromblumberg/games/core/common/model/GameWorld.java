@@ -57,11 +57,11 @@ public class GameWorld implements Disposable {
         herb.setPosition(32, 32);
         herb.setSize(64, 64);
         herb.setMaxVelocityForward(300);
-        herb.setMaxVelocityBackward(120);
+        herb.setMaxVelocityBackward(150);
         herb.setMaxAngleVelocity(170);
         herb.setMaxRotation(250);
-        herb.setMaxAcceleration(250);
-        herb.setMaxDeceleration(250);
+        herb.setMaxAcceleration(300);
+        herb.setMaxDeceleration(380);
 
 //        herb.setDecelerationDist(50);
         addCreature(herb);
@@ -70,13 +70,13 @@ public class GameWorld implements Disposable {
         pred.setRegion("predator");
         pred.setPosition(size - 32, 32);
         pred.setSize(64, 64);
-        pred.setMaxVelocityForward(300);
-        pred.setMaxVelocityBackward(120);
+        pred.setMaxVelocityForward(320);
+        pred.setMaxVelocityBackward(100);
         pred.setMaxAngleVelocity(120);
         pred.setMaxRotation(200);
-        pred.setMaxAcceleration(1500);
-        pred.setMaxDeceleration(2000);
-//        addCreature(pred);
+        pred.setMaxAcceleration(350);
+        pred.setMaxDeceleration(420);
+        addCreature(pred);
     }
 
     public void newGeneration() {

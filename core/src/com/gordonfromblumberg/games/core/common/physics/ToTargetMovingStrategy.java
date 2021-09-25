@@ -25,11 +25,11 @@ public class ToTargetMovingStrategy extends AccelerationMovingStrategy {
         final Vector2 desiredMovement = this.desiredMovement;
         final Vector2 desiredVelocity = this.desiredVelocity;
         desiredMovement.set(target).sub(position);
-        Gdx.app.log("Des movement", desiredMovement + ", mag = " + desiredMovement.len());
+//        Gdx.app.log("Des movement", desiredMovement + ", mag = " + desiredMovement.len());
         desiredVelocity.set(desiredMovement);
         adjustDesiredVelocity(velocity);
-        Gdx.app.log("Des velocity", desiredVelocity + ", mag = " + desiredVelocity.len());
-        acceleration.set(desiredVelocity).sub(velocity).scl(20);
+//        Gdx.app.log("Des velocity", desiredVelocity + ", mag = " + desiredVelocity.len());
+        acceleration.set(desiredVelocity).sub(velocity).scl(1 / dt);
         super.update(position, velocity, acceleration, rotation, dt);
     }
 

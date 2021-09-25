@@ -21,7 +21,7 @@ public class CreatureMovingStrategy extends ToTargetWithDecelerationMovingStrate
 
     @Override
     protected void updateVelocity(Vector2 velocity, Vector2 acceleration, Vector2 rotation, float dt) {
-        Gdx.app.log("Acceleration", acceleration + ", mag = " + acceleration.len());
+//        Gdx.app.log("Acceleration", acceleration + ", mag = " + acceleration.len());
         Vector2 newVelocity = temp.set(velocity).mulAdd(acceleration, dt);
 
         // limit change of velocity angle
@@ -48,9 +48,9 @@ public class CreatureMovingStrategy extends ToTargetWithDecelerationMovingStrate
         float velocityLimit = velToRotationAngle > 90
                 ? maxVelocityBackward
                 : MathUtils.lerp(maxVelocityForward, maxVelocityBackward, velToRotationAngle / 90);
-        Gdx.app.log("Velocity", "Before limit " + temp.len() + ", limit = " + velocityLimit);
+//        Gdx.app.log("Velocity", "Before limit " + temp.len() + ", limit = " + velocityLimit);
         temp.limit2(velocityLimit * velocityLimit);
-        Gdx.app.log("Velocity", "After limit " + temp.len());
+//        Gdx.app.log("Velocity", "After limit " + temp.len());
 
         velocity.set(temp);
 

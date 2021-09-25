@@ -20,7 +20,9 @@ public class AccelerationMovingStrategy implements MovingStrategy {
 
     @Override
     public void update(Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 rotation, float dt) {
+//        Gdx.app.log("Acceleration", "Before limit " + acceleration.len());
         limitAcceleration(velocity, acceleration);
+//        Gdx.app.log("Acceleration", "After limit " + acceleration.len());
 
         updateVelocity(velocity, acceleration, rotation, dt);
 
@@ -33,7 +35,7 @@ public class AccelerationMovingStrategy implements MovingStrategy {
 
         temp.set(velocity).scl(-friction * dt);
         velocity.add(temp);
-        Gdx.app.log("Velocity", "After friction " + velocity.len());
+//        Gdx.app.log("Velocity", "After friction " + velocity.len());
     }
 
     public void setMaxVelocity(float maxVelocity) {
