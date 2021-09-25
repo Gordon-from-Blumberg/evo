@@ -16,6 +16,7 @@ import com.gordonfromblumberg.games.core.evo.WorldParams;
 import com.gordonfromblumberg.games.core.evo.creature.Creature;
 import com.gordonfromblumberg.games.core.evo.event.NewGenerationEvent;
 import com.gordonfromblumberg.games.core.evo.food.Food;
+import com.gordonfromblumberg.games.core.evo.physics.CreatureMovingStrategy;
 
 import static com.gordonfromblumberg.games.core.common.utils.RandomUtils.*;
 
@@ -24,7 +25,8 @@ public class GameWorld implements Disposable {
     public final WorldParams params = new WorldParams();
     private final Array<Creature> creatures = new Array<>();
     private final Array<Food> foods = new Array<>();
-    public Creature creature;
+    public Creature herb;
+    public Creature pred;
 
     private final EventProcessor eventProcessor = new EventProcessor();
 
@@ -45,13 +47,36 @@ public class GameWorld implements Disposable {
                 .findRegion("world-background"),
                 1, 1, 1, 1
         );
+    }
 
-        creature = Creature.getInstance();
-        creature.setRegion("herbivorous");
-        creature.setPosition(32, 32);
-        creature.setSize(64, 64);
+    public void initialize(float size) {
+        setSize(size);
 
-        addCreature(creature);
+        herb = Creature.getInstance();
+        herb.setRegion("herbivorous");
+        herb.setPosition(32, 32);
+        herb.setSize(64, 64);
+        herb.setMaxVelocityForward(300);
+        herb.setMaxVelocityBackward(120);
+        herb.setMaxAngleVelocity(170);
+        herb.setMaxRotation(250);
+        herb.setMaxAcceleration(250);
+        herb.setMaxDeceleration(250);
+
+//        herb.setDecelerationDist(50);
+        addCreature(herb);
+
+        pred = Creature.getInstance();
+        pred.setRegion("predator");
+        pred.setPosition(size - 32, 32);
+        pred.setSize(64, 64);
+        pred.setMaxVelocityForward(300);
+        pred.setMaxVelocityBackward(120);
+        pred.setMaxAngleVelocity(120);
+        pred.setMaxRotation(200);
+        pred.setMaxAcceleration(1500);
+        pred.setMaxDeceleration(2000);
+//        addCreature(pred);
     }
 
     public void newGeneration() {
@@ -133,11 +158,15 @@ public class GameWorld implements Disposable {
             creature.update(delta);
         }
 
+        pred.setTarget(herb.position.x, herb.position.y);
+
         eventProcessor.process();
 
         if (time > 2) {
             time = 0;
             Gdx.app.log("GameWorld", "Creatures: current count = " + creatures.size + ", max count = " + maxCreatureCount);
+            Gdx.app.log("Max velocity", "Herb = " + ((CreatureMovingStrategy) herb.movingStrategy).maxVelMag + ", pred = " + ((CreatureMovingStrategy) pred.movingStrategy).maxVelMag);
+            Gdx.app.log("Max acceleration", "Herb = " + ((CreatureMovingStrategy) herb.movingStrategy).maxAccMag + ", pred = " + ((CreatureMovingStrategy) pred.movingStrategy).maxAccMag);
             Gdx.app.log("GameWorld", "Foods: current count = " + foods.size + ", max count = " + maxFoodCount);
         }
     }

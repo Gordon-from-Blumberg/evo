@@ -31,8 +31,9 @@ public class AccelerationMovingStrategy implements MovingStrategy {
 
         rotate(velocity, rotation, dt);
 
-        temp.set(velocity).scl(-friction);
+        temp.set(velocity).scl(-friction * dt);
         velocity.add(temp);
+        Gdx.app.log("Velocity", "After friction " + velocity.len());
     }
 
     public void setMaxVelocity(float maxVelocity) {

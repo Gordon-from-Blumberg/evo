@@ -96,8 +96,8 @@ public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrate
         if (desMovLen2 <= targetRadius2 && velocity.len2() <= targetVelocityLimit2)
             targetReached = true;
 
+//        Gdx.app.log("Decel dist", "decel dist = " + decelerationDistance2 + ", desired movnt = " + desMovLen2);
         if (desMovLen2 < decelerationDistance2) {
-//            Gdx.app.log("", "decel dist > desired movnt: " + decelerationDistance2 + " > " + desMovLen2);
             desiredVelocity.setLength2(maxVelocity2 * desMovLen2 / decelerationDistance2);
 //            Gdx.app.log("", "desVelocity = " + desiredVelocity);
         } else {

@@ -39,14 +39,14 @@ public class GameScreen extends AbstractScreen {
                 .get("image/texture_pack.atlas", TextureAtlas.class)
                 .findRegion("background");
 
-        gameWorld.setSize(viewport.getWorldHeight());
-        gameWorld.newGeneration();
+        gameWorld.initialize(viewport.getWorldHeight());
+//        gameWorld.newGeneration();
 
         stage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Gdx.app.log("Target", "Target = " + x + ", " + y);
-                gameWorld.creature.setTarget(x, y);
+                gameWorld.herb.setTarget(x, y);
             }
         });
     }

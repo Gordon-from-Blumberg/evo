@@ -16,6 +16,7 @@ public class Creature extends PhysicsGameObject {
     };
 
     private Creature() {
+        movingStrategy = new CreatureMovingStrategy();
     }
 
     public static Creature getInstance() {
@@ -70,5 +71,33 @@ public class Creature extends PhysicsGameObject {
             if (velocity.y > 0)
                 velocity.y = 0;
         }
+    }
+
+    public void setMaxVelocityForward(float value) {
+        ((CreatureMovingStrategy) movingStrategy).setMaxVelocityForward(value);
+    }
+
+    public void setMaxVelocityBackward(float value) {
+        ((CreatureMovingStrategy) movingStrategy).setMaxVelocityBackward(value);
+    }
+
+    public void setMaxAngleVelocity(float value) {
+        ((CreatureMovingStrategy) movingStrategy).setMaxAngleVelocity(value);
+    }
+
+    public void setMaxRotation(float value) {
+        ((CreatureMovingStrategy) movingStrategy).setMaxRotation(value);
+    }
+
+    public void setMaxAcceleration(float value) {
+        ((CreatureMovingStrategy) movingStrategy).setMaxAcceleration(value);
+    }
+
+    public void setMaxDeceleration(float value) {
+        ((CreatureMovingStrategy) movingStrategy).setMaxDeceleration(value);
+    }
+
+    public void setDecelerationDist(float value) {
+        ((CreatureMovingStrategy) movingStrategy).setDecelerationDistance(value);
     }
 }
