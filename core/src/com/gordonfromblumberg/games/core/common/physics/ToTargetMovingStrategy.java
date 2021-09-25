@@ -21,7 +21,7 @@ public class ToTargetMovingStrategy extends AccelerationMovingStrategy {
     }
 
     @Override
-    public void update(Vector2 position, Vector2 velocity, Vector2 acceleration, float dt) {
+    public void update(Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 rotation, float dt) {
         final Vector2 desiredMovement = this.desiredMovement;
         final Vector2 desiredVelocity = this.desiredVelocity;
         desiredMovement.set(target).sub(position);
@@ -30,7 +30,7 @@ public class ToTargetMovingStrategy extends AccelerationMovingStrategy {
         adjustDesiredVelocity(velocity);
 //        Gdx.app.log("Des velocity", desiredVelocity + ", mag = " + desiredVelocity.len());
         acceleration.set(desiredVelocity).sub(velocity).scl(20);
-        super.update(position, velocity, acceleration, dt);
+        super.update(position, velocity, acceleration, rotation, dt);
     }
 
     public void setTarget(float x, float y) {

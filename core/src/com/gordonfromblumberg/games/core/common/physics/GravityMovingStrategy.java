@@ -12,9 +12,9 @@ public class GravityMovingStrategy extends AccelerationMovingStrategy {
     }
 
     @Override
-    public void update(Vector2 position, Vector2 velocity, Vector2 acceleration, float dt) {
+    public void update(Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 rotation, float dt) {
         velocity.mulAdd(gravity, dt);
-        super.update(position, velocity, acceleration, dt);
+        super.update(position, velocity, acceleration, rotation, dt);
     }
 
     public void setGravity(float gravityX, float gravityY) {

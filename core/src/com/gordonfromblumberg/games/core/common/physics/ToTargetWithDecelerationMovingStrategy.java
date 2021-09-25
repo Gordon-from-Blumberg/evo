@@ -10,7 +10,7 @@ public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrate
 
     protected float targetVelocityLimit2 = 0.1f;
     protected float targetRadius2 = 0.1f;
-    protected boolean targetReached;
+    protected boolean targetReached = true;
 
     public ToTargetWithDecelerationMovingStrategy() {}
 
@@ -25,11 +25,11 @@ public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrate
     }
 
     @Override
-    public void update(Vector2 position, Vector2 velocity, Vector2 acceleration, float dt) {
+    public void update(Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 rotation, float dt) {
         if (targetReached)
             return;
 
-        super.update(position, velocity, acceleration, dt);
+        super.update(position, velocity, acceleration, rotation, dt);
     }
 
     @Override
@@ -61,7 +61,10 @@ public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrate
 
         if (decelerate) {
             float velocity2 = velocity.len2();
-            acceleration.setLength2(velocity2 * velocity2 / (4 * desMovLen2));
+            float limit2 = velocity2 * velocity2 / (4 * desMovLen2);
+            if (limit2 > maxDeceleration2)
+                limit2 = maxDeceleration2;
+            acceleration.setLength2(limit2);
         } else {
             acceleration.limit2(maxAcceleration2);
         }
@@ -83,7 +86,7 @@ public class ToTargetWithDecelerationMovingStrategy extends ToTargetMovingStrate
     }
 
     protected float calcDecelerationDist() {
-        return maxVelocity2 / (2 * maxDeceleration);
+        return 1.1f * maxVelocity2 / (2 * maxDeceleration);
     }
 
     @Override

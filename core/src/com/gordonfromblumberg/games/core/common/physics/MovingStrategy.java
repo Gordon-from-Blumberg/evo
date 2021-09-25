@@ -8,7 +8,8 @@ public interface MovingStrategy {
      * @param position Current position
      * @param velocity Current velocity
      * @param acceleration Current acceleration
+     * @param rotation Rotation: x - current angle, y - current angle velocity
      * @param dt Delta time
      */
-    void update(Vector2 position, Vector2 velocity, Vector2 acceleration, float dt);
+    void update(Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 rotation, float dt);
 }

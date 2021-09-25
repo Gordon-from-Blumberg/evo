@@ -14,10 +14,10 @@ public class GravityToPointMovingStrategy extends GravityMovingStrategy {
     }
 
     @Override
-    public void update(Vector2 position, Vector2 velocity, Vector2 acceleration, float dt) {
+    public void update(Vector2 position, Vector2 velocity, Vector2 acceleration, Vector2 rotation, float dt) {
         gravity.set(position)
                 .sub(point)
                 .setLength2(gravityValue2);
-        super.update(position, velocity, acceleration, dt);
+        super.update(position, velocity, acceleration, rotation, dt);
     }
 }

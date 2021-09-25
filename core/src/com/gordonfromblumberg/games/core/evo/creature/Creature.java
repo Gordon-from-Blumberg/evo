@@ -29,10 +29,15 @@ public class Creature extends PhysicsGameObject {
     public void setTarget(float x, float y) {
         if (movingStrategy == null) {
             CreatureMovingStrategy str = new CreatureMovingStrategy();
-            str.setMaxVelocity(1000);
-            str.setMaxAcceleration(500);
-            str.setMaxDeceleration(500);
-            str.setDecelerationDistance(100);
+            str.setMaxVelocityForward(500);
+            str.setMaxVelocityBackward(250);
+
+            str.setMaxAngleVelocity(120);
+            str.setMaxRotation(200);
+
+            str.setMaxAcceleration(1500);
+            str.setMaxDeceleration(2000);
+
             Gdx.app.log("Dec dist", String.valueOf(str.getDecelerationDistance()));
             movingStrategy = str;
         }
