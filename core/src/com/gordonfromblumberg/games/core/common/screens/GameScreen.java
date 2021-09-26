@@ -42,7 +42,7 @@ public class GameScreen extends AbstractScreen {
                 .findRegion("background");
 
         gameWorld.initialize(viewport.getWorldHeight());
-//        gameWorld.newGeneration();
+        gameWorld.newGeneration();
 
         stage.addListener(new ClickListener() {
             @Override

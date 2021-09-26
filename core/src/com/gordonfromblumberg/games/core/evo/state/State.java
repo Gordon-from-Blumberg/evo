@@ -1,10 +1,12 @@
 package com.gordonfromblumberg.games.core.evo.state;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntMap;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.utils.RandomUtils;
 import com.gordonfromblumberg.games.core.evo.creature.Creature;
+import com.gordonfromblumberg.games.core.evo.food.Food;
 
 public enum State {
     WAITING {
@@ -32,6 +34,7 @@ public enum State {
         @Override
         public void enter(Creature creature) {
             creature.getStateParams(this).put(0, DELAY);
+            creature.setForceMultiplier(0.7f);
         }
 
         @Override
@@ -40,16 +43,63 @@ public enum State {
             final float DIST = 5;
             IntMap<Object> stateParams = creature.getStateParams(this);
             float delay = (float) stateParams.get(0) - dt;
+            final Vector2 position = creature.position;
             if (delay <= 0) {
                 temp.setToRandomDirection().scl(Main.CREATURE_SIZE * RADIUS);
                 temp2.set(creature.velocity)
                         .setLength(Main.CREATURE_SIZE * DIST)
-                        .add(creature.position)
+                        .add(position)
                         .add(temp);
                 creature.setTarget(temp2.x, temp2.y);
                 delay = DELAY;
             }
             stateParams.put(0, delay);
+
+            final float radius2 = (float) Math.pow(creature.getSenseRadius() * Main.CREATURE_SIZE, 2);
+            if (creature.isPredator()) {
+                for (Creature victim : creature.gameWorld.getCreatures()) {
+
+                }
+            } else {
+                Food target = null;
+                float minDist2 = Float.MAX_VALUE;
+                for (Food food : creature.gameWorld.getFoods()) {
+                    float dist2 = position.dst2(food.position);
+                    if (dist2 < minDist2) {
+                        minDist2 = dist2;
+                        target = food;
+                    }
+                }
+
+                if (target != null && minDist2 <= radius2) {
+                    creature.setTarget(target);
+                    creature.setState(MOVEMENT_TO_FOOD);
+                }
+            }
+        }
+    },
+
+    MOVEMENT_TO_FOOD {
+        @Override
+        public void enter(Creature creature) {
+            creature.setForceMultiplier(1);
+        }
+
+        @Override
+        public void update(Creature creature, float dt) {
+            if (creature.isPredator()) {
+
+            } else {
+                // TODO: check food has not been eaten
+                Food target = (Food) creature.getTarget();
+                float dist = (creature.getSize() + target.getSize()) * Main.CREATURE_SIZE * 0.5f * 0.8f;
+//                Gdx.app.log("MOVEMENT_TO_FOOD", "Creature size = " + creature.getSize() + ", target = " + target.getSize() + ", dist = " + dist);
+                if (target.position.dst2(creature.position) <= dist * dist) {
+                    Gdx.app.log("MOVEMENT_TO_FOOD", "Eat food, real dist = " + target.position.dst(creature.position));
+                    creature.eat(target);
+                    creature.setState(FOOD_SEARCHING);
+                }
+            }
         }
     };
 

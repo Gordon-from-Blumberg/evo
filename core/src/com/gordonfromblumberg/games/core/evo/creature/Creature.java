@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 import com.gordonfromblumberg.games.core.common.model.PhysicsGameObject;
+import com.gordonfromblumberg.games.core.evo.food.Food;
 import com.gordonfromblumberg.games.core.evo.physics.CreatureMovingStrategy;
 import com.gordonfromblumberg.games.core.evo.state.State;
 
@@ -21,7 +22,12 @@ public class Creature extends PhysicsGameObject {
     private final IntMap[] stateParams = new IntMap[State.values().length];
 
     private State state;
+    private boolean isPredator;
     private GameObject target;
+    private float senseRadius;
+    private float forceMultiplier;
+    private int size;
+    private float requiredSatiety, satiety;
 
     private Creature() {
         movingStrategy = new CreatureMovingStrategy();
@@ -60,6 +66,15 @@ public class Creature extends PhysicsGameObject {
         }
 
         ((CreatureMovingStrategy) movingStrategy).setTarget(x, y);
+    }
+
+    public void eat(GameObject foodObject) {
+        // TODO for predators
+        if (foodObject instanceof Food) {
+            Food food = (Food) foodObject;
+            satiety += food.getValue();
+            gameWorld.removeFood(food);
+        }
     }
 
     @Override
@@ -121,6 +136,7 @@ public class Creature extends PhysicsGameObject {
         if (this.state != state) {
             this.state = state;
             state.enter(this);
+            Gdx.app.log("State", "Creature #" + id + " entered in " + state + " state");
         }
     }
 
@@ -128,5 +144,62 @@ public class Creature extends PhysicsGameObject {
         if (stateParams[state.ordinal()] == null)
             stateParams[state.ordinal()] = new IntMap<>();
         return stateParams[state.ordinal()];
+    }
+
+    public GameObject getTarget() {
+        return target;
+    }
+
+    public void setTarget(GameObject target) {
+        this.target = target;
+        setTarget(target.position.x, target.position.y);
+    }
+
+    public float getSenseRadius() {
+        return senseRadius;
+    }
+
+    public void setSenseRadius(float senseRadius) {
+        this.senseRadius = senseRadius;
+    }
+
+    public boolean isPredator() {
+        return isPredator;
+    }
+
+    public void setPredator(boolean predator) {
+        isPredator = predator;
+    }
+
+    public float getForceMultiplier() {
+        return forceMultiplier;
+    }
+
+    public void setForceMultiplier(float forceMultiplier) {
+        this.forceMultiplier = forceMultiplier;
+    }
+
+    public float getSize() {
+        return 1 + 0.1f * size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public float getRequiredSatiety() {
+        return requiredSatiety;
+    }
+
+    public void setRequiredSatiety(float requiredSatiety) {
+        this.requiredSatiety = requiredSatiety;
+    }
+
+    public float getSatiety() {
+        return satiety;
+    }
+
+    public void setSatiety(float satiety) {
+        this.satiety = satiety;
     }
 }

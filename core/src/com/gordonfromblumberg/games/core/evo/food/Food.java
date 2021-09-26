@@ -32,4 +32,8 @@ public class Food extends GameObject {
     public void setValue(float value) {
         this.value = value;
     }
+
+    public float getSize() {
+        return 0.05f * value;
+    }
 }

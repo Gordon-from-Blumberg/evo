@@ -5,7 +5,7 @@ public class WorldParams {
     private float foodValueFrom, foodValueTo;
 
     public WorldParams() {
-        foodCountFrom = foodCountTo = 2;
+        foodCountFrom = foodCountTo = 10;
         foodValueFrom = foodValueTo = 10;
     }
 
