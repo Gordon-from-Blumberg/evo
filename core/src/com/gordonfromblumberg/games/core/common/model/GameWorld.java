@@ -76,7 +76,7 @@ public class GameWorld implements Disposable {
         pred.setMaxRotation(180);
         pred.setMaxAcceleration(baseSize * 5);
         pred.setMaxDeceleration(baseSize * 6.5f);
-        addCreature(pred);
+//        addCreature(pred);
     }
 
     public void newGeneration() {

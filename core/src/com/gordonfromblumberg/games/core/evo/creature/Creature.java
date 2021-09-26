@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool;
+import com.gordonfromblumberg.games.core.common.model.GameObject;
 import com.gordonfromblumberg.games.core.common.model.PhysicsGameObject;
 import com.gordonfromblumberg.games.core.evo.physics.CreatureMovingStrategy;
 import com.gordonfromblumberg.games.core.evo.state.State;
@@ -19,7 +20,8 @@ public class Creature extends PhysicsGameObject {
 
     private final IntMap[] stateParams = new IntMap[State.values().length];
 
-    private State state = State.WAITING;
+    private State state;
+    private GameObject target;
 
     private Creature() {
         movingStrategy = new CreatureMovingStrategy();
@@ -35,6 +37,8 @@ public class Creature extends PhysicsGameObject {
 
     @Override
     public void update(float delta) {
+        if (state == null)
+            setState(State.WAITING);
         state.update(this, delta);
         super.update(delta);
     }

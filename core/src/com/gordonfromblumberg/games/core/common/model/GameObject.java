@@ -31,7 +31,7 @@ public class GameObject implements Disposable, Pool.Poolable {
 
     protected final Sprite sprite = new Sprite();
     public final Polygon polygon = createPolygon();
-    protected final Vector2 position = new Vector2();
+    public final Vector2 position = new Vector2();
     protected float width, height;
 
     protected final Pool pool;
