@@ -121,9 +121,9 @@ public class GameScreen extends AbstractScreen {
                 .skin(uiSkin)
                 .minValue(1)
                 .maxValue(1000);
-        uiRootTable.add(intFieldBuilder.text("2").handler(gameWorld.params::setFoodCountFrom).build()).width(50).align(Align.left);
+        uiRootTable.add(intFieldBuilder.text("10").handler(gameWorld.params::setFoodCountFrom).build()).width(50).align(Align.left);
         uiRootTable.add(new Label("to:", uiSkin)).padLeft(15);
-        uiRootTable.add(intFieldBuilder.text("2").handler(gameWorld.params::setFoodCountTo).build()).width(50).align(Align.left);
+        uiRootTable.add(intFieldBuilder.text("10").handler(gameWorld.params::setFoodCountTo).build()).width(50).align(Align.left);
 
         uiRootTable.row();
         uiRootTable.add(new Label("Value", uiSkin));

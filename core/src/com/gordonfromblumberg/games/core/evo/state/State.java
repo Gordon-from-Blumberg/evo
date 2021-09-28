@@ -95,7 +95,7 @@ public enum State {
                 float dist = (creature.getSize() + target.getSize()) * Main.CREATURE_SIZE * 0.5f * 0.8f;
 //                Gdx.app.log("MOVEMENT_TO_FOOD", "Creature size = " + creature.getSize() + ", target = " + target.getSize() + ", dist = " + dist);
                 if (target.position.dst2(creature.position) <= dist * dist) {
-                    Gdx.app.log("MOVEMENT_TO_FOOD", "Eat food, real dist = " + target.position.dst(creature.position));
+                    Gdx.app.log("MOVEMENT_TO_FOOD", "Creature #" + creature.getId() + " eats food, real dist = " + target.position.dst(creature.position));
                     creature.eat(target);
                     creature.setState(FOOD_SEARCHING);
                 }

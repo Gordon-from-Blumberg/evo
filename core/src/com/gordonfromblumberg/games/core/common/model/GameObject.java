@@ -46,6 +46,10 @@ public class GameObject implements Disposable, Pool.Poolable {
         this.pool = pool;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public void update(float delta) {}
 
     public void render(Batch batch) {

@@ -25,7 +25,7 @@ public class GameWorld implements Disposable {
     public final WorldParams params = new WorldParams();
     private final Array<Creature> creatures = new Array<>();
     private final Array<Food> foods = new Array<>();
-    public Creature herb;
+    public Creature herb, herb2;
     public Creature pred;
 
     private final EventProcessor eventProcessor = new EventProcessor();
@@ -63,10 +63,24 @@ public class GameWorld implements Disposable {
         herb.setMaxVelocityBackward(baseSize * 2);
         herb.setMaxAngleVelocity(180);
         herb.setMaxRotation(250);
-        herb.setMaxAcceleration(baseSize * 4.5f);
+        herb.setMaxAcceleration(baseSize * 5f);
         herb.setMaxDeceleration(baseSize * 5.5f);
         herb.setSenseRadius(5);
         addCreature(herb);
+
+        herb2 = Creature.getInstance();
+        herb2.setPredator(false);
+        herb2.setRegion("herbivorous");
+        herb2.setPosition(size - baseSize / 2, size - baseSize / 2);
+        herb2.setSize(baseSize, baseSize);
+        herb2.setMaxVelocityForward(baseSize * 5);
+        herb2.setMaxVelocityBackward(baseSize * 2);
+        herb2.setMaxAngleVelocity(180);
+        herb2.setMaxRotation(250);
+        herb2.setMaxAcceleration(baseSize * 5f);
+        herb2.setMaxDeceleration(baseSize * 5.5f);
+        herb2.setSenseRadius(5);
+        addCreature(herb2);
 
         pred = Creature.getInstance();
         pred.setPredator(true);
