@@ -19,6 +19,7 @@ public class Creature extends EvoGameObject {
         }
     };
 
+    private final DNA dna = new DNA();
     private final IntMap[] stateParams = new IntMap[State.values().length];
 
     private State state;
@@ -26,7 +27,7 @@ public class Creature extends EvoGameObject {
     private EvoGameObject target;
     private float senseRadius;
     private float forceMultiplier;
-    private int size;
+    private float size;
     private float requiredSatiety, satiety;
 
     private Creature() {
@@ -35,6 +36,10 @@ public class Creature extends EvoGameObject {
 
     public static Creature getInstance() {
         return pool.obtain();
+    }
+
+    public void init() {
+        size = dna.getSize();
     }
 
     @Override
@@ -47,18 +52,7 @@ public class Creature extends EvoGameObject {
 
     public void setTarget(float x, float y) {
         if (movingStrategy == null) {
-            CreatureMovingStrategy str = new CreatureMovingStrategy();
-            str.setMaxVelocityForward(500);
-            str.setMaxVelocityBackward(250);
-
-            str.setMaxAngleVelocity(120);
-            str.setMaxRotation(200);
-
-            str.setMaxAcceleration(1500);
-            str.setMaxDeceleration(2000);
-
-            Gdx.app.log("Dec dist", String.valueOf(str.getDecelerationDistance()));
-            movingStrategy = str;
+            movingStrategy = new CreatureMovingStrategy();
         }
 
         ((CreatureMovingStrategy) movingStrategy).setTarget(x, y);
@@ -188,11 +182,7 @@ public class Creature extends EvoGameObject {
 
     @Override
     public float getSize() {
-        return 1 + 0.1f * size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
+        return size;
     }
 
     public float getRequiredSatiety() {
