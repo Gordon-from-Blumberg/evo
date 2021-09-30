@@ -2,11 +2,13 @@ package com.gordonfromblumberg.games.core.evo.state;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.utils.RandomUtils;
 import com.gordonfromblumberg.games.core.evo.creature.Creature;
 import com.gordonfromblumberg.games.core.evo.food.Food;
+import com.gordonfromblumberg.games.core.evo.model.EvoGameObject;
 
 public enum State {
     WAITING {
@@ -56,24 +58,22 @@ public enum State {
             stateParams.put(0, delay);
 
             final float radius2 = (float) Math.pow(creature.getSenseRadius() * Main.CREATURE_SIZE, 2);
-            if (creature.isPredator()) {
-                for (Creature victim : creature.gameWorld.getCreatures()) {
-
-                }
-            } else {
-                Food target = null;
-                float minDist2 = Float.MAX_VALUE;
-                for (Food food : creature.gameWorld.getFoods()) {
+            EvoGameObject target = null;
+            float minDist2 = Float.MAX_VALUE;
+            Array<EvoGameObject> foods = creature.gameWorld.getGameObjects();
+            for (int i = 0, size = foods.size; i < size; i++) {
+                EvoGameObject food = foods.get(i);
+                if (creature.isEatable(food)) {
                     float dist2 = position.dst2(food.position);
                     if (dist2 < minDist2) {
                         minDist2 = dist2;
                         target = food;
                     }
-                }
 
-                if (target != null && minDist2 <= radius2) {
-                    creature.setTarget(target);
-                    creature.setState(MOVEMENT_TO_FOOD);
+                    if (target != null && minDist2 <= radius2) {
+                        creature.setTarget(target);
+                        creature.setState(MOVEMENT_TO_FOOD);
+                    }
                 }
             }
         }
@@ -91,7 +91,7 @@ public enum State {
 
             } else {
                 // TODO: check food has not been eaten
-                Food target = (Food) creature.getTarget();
+                EvoGameObject target = (EvoGameObject) creature.getTarget();
                 float dist = (creature.getSize() + target.getSize()) * Main.CREATURE_SIZE * 0.5f * 0.8f;
 //                Gdx.app.log("MOVEMENT_TO_FOOD", "Creature size = " + creature.getSize() + ", target = " + target.getSize() + ", dist = " + dist);
                 if (target.position.dst2(creature.position) <= dist * dist) {

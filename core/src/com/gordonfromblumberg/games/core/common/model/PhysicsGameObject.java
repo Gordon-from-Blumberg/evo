@@ -6,6 +6,7 @@ import com.gordonfromblumberg.games.core.common.physics.MovingStrategy;
 public class PhysicsGameObject extends GameObject {
     public final Vector2 velocity = new Vector2();
     public final Vector2 acceleration = new Vector2();
+    // x - rotation, y - angle velocity
     public final Vector2 rotation = new Vector2();
 
     protected MovingStrategy movingStrategy;

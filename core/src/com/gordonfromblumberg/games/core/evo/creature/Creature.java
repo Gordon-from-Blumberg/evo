@@ -5,12 +5,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
-import com.gordonfromblumberg.games.core.common.model.PhysicsGameObject;
 import com.gordonfromblumberg.games.core.evo.food.Food;
+import com.gordonfromblumberg.games.core.evo.model.EvoGameObject;
 import com.gordonfromblumberg.games.core.evo.physics.CreatureMovingStrategy;
 import com.gordonfromblumberg.games.core.evo.state.State;
 
-public class Creature extends PhysicsGameObject {
+public class Creature extends EvoGameObject {
 
     private static final Pool<Creature> pool = new Pool<Creature>() {
         @Override
@@ -23,7 +23,7 @@ public class Creature extends PhysicsGameObject {
 
     private State state;
     private boolean isPredator;
-    private GameObject target;
+    private EvoGameObject target;
     private float senseRadius;
     private float forceMultiplier;
     private int size;
@@ -35,10 +35,6 @@ public class Creature extends PhysicsGameObject {
 
     public static Creature getInstance() {
         return pool.obtain();
-    }
-
-    public void release() {
-        pool.free(this);
     }
 
     @Override
@@ -68,13 +64,18 @@ public class Creature extends PhysicsGameObject {
         ((CreatureMovingStrategy) movingStrategy).setTarget(x, y);
     }
 
-    public void eat(GameObject foodObject) {
+    public void eat(EvoGameObject foodObject) {
         // TODO for predators
         if (foodObject instanceof Food) {
             Food food = (Food) foodObject;
             satiety += food.getValue();
-            gameWorld.removeFood(food);
+            gameWorld.removeGameObject(food);
         }
+    }
+
+    public boolean isEatable(EvoGameObject go) {
+        return isPredator && go instanceof Creature
+                || !isPredator && go instanceof Food;
     }
 
     @Override
@@ -150,9 +151,15 @@ public class Creature extends PhysicsGameObject {
         return target;
     }
 
-    public void setTarget(GameObject target) {
+    public void setTarget(EvoGameObject target) {
+        if (this.target != null && this.target != target) {
+            this.target.removeChaser(this);
+        }
         this.target = target;
-        setTarget(target.position.x, target.position.y);
+        if (target != null) {
+            setTarget(target.position.x, target.position.y);
+            target.addChaser(this);
+        }
     }
 
     public float getSenseRadius() {
@@ -179,6 +186,7 @@ public class Creature extends PhysicsGameObject {
         this.forceMultiplier = forceMultiplier;
     }
 
+    @Override
     public float getSize() {
         return 1 + 0.1f * size;
     }
@@ -201,5 +209,9 @@ public class Creature extends PhysicsGameObject {
 
     public void setSatiety(float satiety) {
         this.satiety = satiety;
+    }
+
+    public void release() {
+        pool.free(this);
     }
 }

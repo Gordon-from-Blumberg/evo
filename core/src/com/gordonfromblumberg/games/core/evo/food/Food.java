@@ -2,8 +2,9 @@ package com.gordonfromblumberg.games.core.evo.food;
 
 import com.badlogic.gdx.utils.Pool;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
+import com.gordonfromblumberg.games.core.evo.model.EvoGameObject;
 
-public class Food extends GameObject {
+public class Food extends EvoGameObject {
 
     private static final Pool<Food> pool = new Pool<Food>() {
         @Override
@@ -21,10 +22,6 @@ public class Food extends GameObject {
         return pool.obtain();
     }
 
-    public void release() {
-        pool.free(this);
-    }
-
     public float getValue() {
         return value;
     }
@@ -33,7 +30,13 @@ public class Food extends GameObject {
         this.value = value;
     }
 
+    @Override
     public float getSize() {
         return 0.05f * value;
+    }
+
+    @Override
+    public void release() {
+        pool.free(this);
     }
 }
