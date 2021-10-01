@@ -18,6 +18,8 @@ public class Creature extends EvoGameObject {
             return new Creature();
         }
     };
+    private static final float BASE_SATIETY = 10;
+    private static final float BASE_SENSE_RADIUS = 5;
 
     private final DNA dna = new DNA();
     private final IntMap[] stateParams = new IntMap[State.values().length];
@@ -28,7 +30,7 @@ public class Creature extends EvoGameObject {
     private float senseRadius;
     private float forceMultiplier;
     private float size;
-    private float requiredSatiety, satiety;
+    private float requiredSatiety, offspringSatiety, satiety;
 
     private Creature() {
         movingStrategy = new CreatureMovingStrategy();
@@ -39,7 +41,12 @@ public class Creature extends EvoGameObject {
     }
 
     public void init() {
+        isPredator = dna.getFoodType() == DNA.FoodType.PREDATOR;
         size = dna.getSize();
+        senseRadius = dna.getSense() * BASE_SENSE_RADIUS;
+        requiredSatiety = calcRequiredSatiety();
+        offspringSatiety = calcOffspringSatiety();
+        satiety = 0;
     }
 
     @Override
@@ -156,20 +163,23 @@ public class Creature extends EvoGameObject {
         }
     }
 
+    private float calcRequiredSatiety() {
+        float baseReqSatiety = (float) Math.pow(dna.getSize(), 3);
+        float reqSatietyMod = dna.getVelocityMod();
+        reqSatietyMod += dna.getSenseMod();
+        return baseReqSatiety * (1 + reqSatietyMod) * BASE_SATIETY;
+    }
+
+    private float calcOffspringSatiety() {
+        return requiredSatiety * 2;
+    }
+
     public float getSenseRadius() {
         return senseRadius;
     }
 
-    public void setSenseRadius(float senseRadius) {
-        this.senseRadius = senseRadius;
-    }
-
     public boolean isPredator() {
         return isPredator;
-    }
-
-    public void setPredator(boolean predator) {
-        isPredator = predator;
     }
 
     public float getForceMultiplier() {
@@ -189,16 +199,12 @@ public class Creature extends EvoGameObject {
         return requiredSatiety;
     }
 
-    public void setRequiredSatiety(float requiredSatiety) {
-        this.requiredSatiety = requiredSatiety;
+    public float getOffspringSatiety() {
+        return offspringSatiety;
     }
 
     public float getSatiety() {
         return satiety;
-    }
-
-    public void setSatiety(float satiety) {
-        this.satiety = satiety;
     }
 
     public void release() {

@@ -55,7 +55,6 @@ public class GameWorld implements Disposable {
         setSize(size);
 
         herb = Creature.getInstance();
-        herb.setPredator(false);
         herb.setRegion("herbivorous");
         herb.setPosition(baseSize / 2, baseSize / 2);
         herb.setSize(baseSize, baseSize);
@@ -65,11 +64,10 @@ public class GameWorld implements Disposable {
         herb.setMaxRotation(250);
         herb.setMaxAcceleration(baseSize * 5f);
         herb.setMaxDeceleration(baseSize * 5.5f);
-        herb.setSenseRadius(5);
+        herb.init();
         addGameObject(herb);
 
         herb2 = Creature.getInstance();
-        herb2.setPredator(false);
         herb2.setRegion("herbivorous");
         herb2.setPosition(size - baseSize / 2, size - baseSize / 2);
         herb2.setSize(baseSize, baseSize);
@@ -79,11 +77,10 @@ public class GameWorld implements Disposable {
         herb2.setMaxRotation(250);
         herb2.setMaxAcceleration(baseSize * 5f);
         herb2.setMaxDeceleration(baseSize * 5.5f);
-        herb2.setSenseRadius(5);
+        herb2.init();
         addGameObject(herb2);
 
         pred = Creature.getInstance();
-        pred.setPredator(true);
         pred.setRegion("predator");
         pred.setPosition(size - baseSize / 2, baseSize / 2);
         pred.setSize(baseSize, baseSize);
@@ -93,7 +90,6 @@ public class GameWorld implements Disposable {
         pred.setMaxRotation(180);
         pred.setMaxAcceleration(baseSize * 5);
         pred.setMaxDeceleration(baseSize * 6.5f);
-        pred.setSenseRadius(5);
 //        addCreature(pred);
     }
 

@@ -96,10 +96,37 @@ public enum State {
 //                Gdx.app.log("MOVEMENT_TO_FOOD", "Creature size = " + creature.getSize() + ", target = " + target.getSize() + ", dist = " + dist);
                 if (target.position.dst2(creature.position) <= dist * dist) {
                     Gdx.app.log("MOVEMENT_TO_FOOD", "Creature #" + creature.getId() + " eats food, real dist = " + target.position.dst(creature.position));
-                    creature.eat(target);
-                    creature.setState(FOOD_SEARCHING);
+                    creature.eat(target); // TODO use state for eating
+                    creature.setState(creature.getSatiety() >= creature.getOffspringSatiety()
+                            ? MOVEMENT_TO_HOME
+                            : FOOD_SEARCHING
+                    );
                 }
             }
+        }
+    },
+
+    MOVEMENT_TO_HOME {
+        @Override
+        public void enter(Creature creature) {
+            float worldWidth = creature.gameWorld.width;
+            float worldHeight = creature.gameWorld.height;
+            float x = creature.position.x;
+            float y = creature.position.y;
+            float halfSize = creature.getSize() * Main.CREATURE_SIZE / 2;
+            float dx = x > worldWidth / 2 ? worldWidth - x - halfSize : halfSize - x;
+            float dy = y > worldHeight / 2 ? worldHeight - y - halfSize : halfSize - y;
+            if (Math.abs(dx) > Math.abs(dy)) {
+                creature.setTarget(x, y + dy);
+            } else {
+                creature.setTarget(x + dx, y);
+            }
+            creature.setForceMultiplier(0.7f);
+        }
+
+        @Override
+        public void update(Creature creature, float dt) {
+            // TODO check for predators
         }
     };
 
