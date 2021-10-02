@@ -1,14 +1,28 @@
 package com.gordonfromblumberg.games.core.evo.creature;
 
+import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
+import com.gordonfromblumberg.games.core.common.utils.RandomUtils;
+
 public class DNA {
-    private static final int MIN_VALUE = -9;
+    private static final float MUTATION_CHANCE = AbstractFactory.getInstance().configManager().getFloat("game.mutation.chance");
+    private static final byte MIN_VALUE = -9;
 
-    private static final int FOOD_TYPE    = 0;
-    private static final int SIZE         = 1;
-    private static final int VELOCITY     = 2;
-    private static final int SENSE        = 3;
+    private final byte[] genes = new byte[Gene.values().length];
 
-    private final byte[] genes = new byte[4];
+    enum Gene {
+        FOOD_TYPE(false, false),
+        SIZE(true, true),
+        VELOCITY(true, true),
+        SENSE(true, true);
+
+        private final boolean mutable;
+        private final boolean mutableByOne;
+
+        Gene(boolean mutable, boolean mutableByOne) {
+            this.mutable = mutable;
+            this.mutableByOne = mutableByOne;
+        }
+    }
 
     enum FoodType {
         HERBIVOROUS,
@@ -16,26 +30,36 @@ public class DNA {
     }
 
     FoodType getFoodType() {
-        return FoodType.values()[genes[FOOD_TYPE]];
+        return FoodType.values()[genes[Gene.FOOD_TYPE.ordinal()]];
     }
 
-    float getSize() {
-        return 1 + 0.1f * genes[SIZE];
+    byte getSize() {
+        return genes[Gene.SIZE.ordinal()];
     }
 
-    float getVelocity() {
-        return 1 + 0.1f * genes[VELOCITY];
+    byte getVelocity() {
+        return genes[Gene.VELOCITY.ordinal()];
     }
 
-    float getVelocityMod() {
-        return 0.1f * genes[VELOCITY];
+    byte getSense() {
+        return genes[Gene.SENSE.ordinal()];
     }
 
-    float getSense() {
-        return 1 + 0.1f * genes[SENSE];
+    void copy(DNA other) {
+        System.arraycopy(genes, 0, other.genes, 0, genes.length);
     }
 
-    float getSenseMod() {
-        return 0.1f * genes[SENSE];
+    void mutate() {
+        for (Gene geneType : Gene.values()) {
+            if (geneType.mutable && RandomUtils.nextBool(MUTATION_CHANCE)) {
+                byte current = genes[geneType.ordinal()];
+                if (current == MIN_VALUE)
+                    genes[geneType.ordinal()] = MIN_VALUE + 1;
+                else if (RandomUtils.nextBool())
+                    genes[geneType.ordinal()] = (byte) (current + 1);
+                else
+                    genes[geneType.ordinal()] = (byte) (current - 1);
+            }
+        }
     }
 }

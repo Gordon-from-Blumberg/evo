@@ -9,12 +9,24 @@ public class RandomUtils {
         return from == to ? from : from + RAND.nextInt(to - from);
     }
 
+    public static float nextFloat() {
+        return RAND.nextFloat();
+    }
+
     public static float nextFloat(float max) {
         return max * RAND.nextFloat();
     }
 
     public static float nextFloat(float from, float to) {
         return from == to ? from : from + ((to - from) * RAND.nextFloat());
+    }
+
+    public static boolean nextBool() {
+        return RAND.nextFloat() < 0.5f;
+    }
+
+    public static boolean nextBool(float chance) {
+        return RAND.nextFloat() < chance;
     }
 
     public static RandomGen randomGen(long seed) {

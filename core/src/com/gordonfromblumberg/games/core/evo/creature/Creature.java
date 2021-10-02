@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool;
+import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 import com.gordonfromblumberg.games.core.evo.food.Food;
 import com.gordonfromblumberg.games.core.evo.model.EvoGameObject;
@@ -18,8 +19,8 @@ public class Creature extends EvoGameObject {
             return new Creature();
         }
     };
-    private static final float BASE_SATIETY = 10;
-    private static final float BASE_SENSE_RADIUS = 5;
+    private static final float BASE_SATIETY = AbstractFactory.getInstance().configManager().getFloat("game.creature.satiety");
+    private static final float BASE_SENSE_RADIUS = AbstractFactory.getInstance().configManager().getFloat("game.creature.sense");
 
     private final DNA dna = new DNA();
     private final IntMap[] stateParams = new IntMap[State.values().length];
@@ -31,6 +32,7 @@ public class Creature extends EvoGameObject {
     private float forceMultiplier;
     private float size;
     private float requiredSatiety, offspringSatiety, satiety;
+    private int offspringCount;
 
     private Creature() {
         movingStrategy = new CreatureMovingStrategy();
@@ -42,10 +44,11 @@ public class Creature extends EvoGameObject {
 
     public void init() {
         isPredator = dna.getFoodType() == DNA.FoodType.PREDATOR;
-        size = dna.getSize();
-        senseRadius = dna.getSense() * BASE_SENSE_RADIUS;
+        size = 1 + 0.1f * dna.getSize();
+        senseRadius = (1 + 0.1f * dna.getSense()) * BASE_SENSE_RADIUS;
         requiredSatiety = calcRequiredSatiety();
         offspringSatiety = calcOffspringSatiety();
+        offspringCount = 1;
         satiety = 0;
     }
 
@@ -77,6 +80,16 @@ public class Creature extends EvoGameObject {
     public boolean isEatable(EvoGameObject go) {
         return isPredator && go instanceof Creature
                 || !isPredator && go instanceof Food;
+    }
+
+    public void produceOffspring() {
+        for (int i = 0; i < offspringCount; i++) {
+            Creature child = pool.obtain();
+            dna.copy(child.dna);
+            child.dna.mutate();
+            child.init();
+            gameWorld.addGameObject(child);
+        }
     }
 
     @Override
@@ -164,9 +177,9 @@ public class Creature extends EvoGameObject {
     }
 
     private float calcRequiredSatiety() {
-        float baseReqSatiety = (float) Math.pow(dna.getSize(), 3);
-        float reqSatietyMod = dna.getVelocityMod();
-        reqSatietyMod += dna.getSenseMod();
+        float baseReqSatiety = (float) Math.pow(size, 3);
+        float reqSatietyMod = 0.1f * dna.getVelocity();
+        reqSatietyMod += 0.1f * dna.getSense();
         return baseReqSatiety * (1 + reqSatietyMod) * BASE_SATIETY;
     }
 
