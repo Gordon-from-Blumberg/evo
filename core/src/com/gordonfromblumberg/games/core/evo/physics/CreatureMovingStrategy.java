@@ -3,10 +3,10 @@ package com.gordonfromblumberg.games.core.evo.physics;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.gordonfromblumberg.games.core.common.physics.ToTargetWithDecelerationMovingStrategy;
+import com.gordonfromblumberg.games.core.common.physics.ToTargetMovingStrategy;
 import com.gordonfromblumberg.games.core.common.utils.MathHelper;
 
-public class CreatureMovingStrategy extends ToTargetWithDecelerationMovingStrategy {
+public class CreatureMovingStrategy extends ToTargetMovingStrategy {
     private static final Vector2 temp = new Vector2();
 
     public float maxVelMag = 0;

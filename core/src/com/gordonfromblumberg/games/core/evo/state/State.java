@@ -37,6 +37,7 @@ public enum State {
         public void enter(Creature creature) {
             creature.getStateParams(this).put(0, DELAY);
             creature.setForceMultiplier(0.7f);
+            creature.setDecelerate(false);
         }
 
         @Override
@@ -83,6 +84,7 @@ public enum State {
         @Override
         public void enter(Creature creature) {
             creature.setForceMultiplier(1);
+            creature.setDecelerate(!creature.isPredator());
         }
 
         @Override
@@ -122,6 +124,7 @@ public enum State {
                 creature.setTarget(x + dx, y);
             }
             creature.setForceMultiplier(0.7f);
+            creature.setDecelerate(true);
         }
 
         @Override

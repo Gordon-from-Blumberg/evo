@@ -147,6 +147,10 @@ public class Creature extends EvoGameObject {
         ((CreatureMovingStrategy) movingStrategy).setDecelerationDistance(value);
     }
 
+    public void setDecelerate(boolean decelerate) {
+        ((CreatureMovingStrategy) movingStrategy).setDecelerate(decelerate);
+    }
+
     public void setState(State state) {
         if (this.state != state) {
             this.state = state;
