@@ -49,7 +49,7 @@
 		"default": { "font": "default-font", "fontColor": "white" }
 	},
 	"TextFieldStyle": {
-		"default": { "selection": "selection", "background": "textfield", "font": "default-font", "fontColor": "white", "cursor": "cursor" }
+		"default": { "selection": "selection", "background": "textfield", "font": "default-font", "fontColor": "white", "cursor": "cursor" },
 		"error": { "selection": "selection", "background": "textfield", "font": "default-font", "fontColor": "red", "cursor": "cursor" }
 	},
 	"CheckBoxStyle": {

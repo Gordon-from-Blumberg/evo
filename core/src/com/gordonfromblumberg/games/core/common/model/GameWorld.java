@@ -1,9 +1,13 @@
 package com.gordonfromblumberg.games.core.common.model;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -35,18 +39,26 @@ public class GameWorld implements Disposable {
     int generation;
     public float width, height;
 
+    private boolean paused, started;
+    private final Color pauseColor = Color.GRAY;
+    private final BitmapFontCache pauseText;
+
     private NinePatch background;
 
     int maxGameObjectCount = 0;
     private float time = 0;
 
     public GameWorld() {
-        background = new NinePatch(Main.getInstance()
-                .assets()
-                .get("image/texture_pack.atlas", TextureAtlas.class)
-                .findRegion("world-background"),
+        final AssetManager assets = Main.getInstance().assets();
+
+        background = new NinePatch(
+                assets.get("image/texture_pack.atlas", TextureAtlas.class)
+                        .findRegion("world-background"),
                 1, 1, 1, 1
         );
+
+        pauseText = new BitmapFontCache(assets.get("ui/uiskin.json", Skin.class).getFont("default-font"));
+        pauseText.setText("PAUSE", 100, 100);
     }
 
     public void initialize(float size) {
@@ -99,6 +111,7 @@ public class GameWorld implements Disposable {
         NewGenerationEvent event = NewGenerationEvent.getInstance();
         event.setGenerationNumber(generation);
         eventProcessor.push(event);
+        started = true;
     }
 
     public void generateFood() {
@@ -152,29 +165,48 @@ public class GameWorld implements Disposable {
     }
 
     public void update(float delta) {
-        time += delta;
+        if (started && !paused) {
+            time += delta;
 
-        for (EvoGameObject go : gameObjects) {
-            go.update(delta);
-        }
+            for (EvoGameObject go : gameObjects) {
+                go.update(delta);
+            }
 
-        pred.setTarget(herb.position.x, herb.position.y);
+            pred.setTarget(herb.position.x, herb.position.y);
 
-        eventProcessor.process();
+            eventProcessor.process();
 
-        if (time > 2) {
-            time = 0;
-            Gdx.app.log("GameWorld", "Game objects: current count = " + gameObjects.size + ", max count = " + maxGameObjectCount);
-            Gdx.app.log("Max velocity", "Herb = " + ((CreatureMovingStrategy) herb.movingStrategy).maxVelMag + ", pred = " + ((CreatureMovingStrategy) pred.movingStrategy).maxVelMag);
-            Gdx.app.log("Max acceleration", "Herb = " + ((CreatureMovingStrategy) herb.movingStrategy).maxAccMag + ", pred = " + ((CreatureMovingStrategy) pred.movingStrategy).maxAccMag);
+            if (time > 2) {
+                time = 0;
+                Gdx.app.log("GameWorld", "Game objects: current count = " + gameObjects.size + ", max count = " + maxGameObjectCount);
+                Gdx.app.log("Max velocity", "Herb = " + ((CreatureMovingStrategy) herb.movingStrategy).maxVelMag + ", pred = " + ((CreatureMovingStrategy) pred.movingStrategy).maxVelMag);
+                Gdx.app.log("Max acceleration", "Herb = " + ((CreatureMovingStrategy) herb.movingStrategy).maxAccMag + ", pred = " + ((CreatureMovingStrategy) pred.movingStrategy).maxAccMag);
+            }
         }
     }
 
     public void render(Batch batch) {
+        final Color origColor = batch.getColor();
+        if (paused)
+            batch.setColor(pauseColor);
+
         background.draw(batch, 0, 0, 0, 0, 64 * width, 64 * height, 1f/64, 1f/64, 0);
 
-        for (EvoGameObject go : gameObjects) {
-            go.render(batch);
+        if (paused) {
+            for (EvoGameObject go : gameObjects) {
+                go.sprite.setColor(pauseColor);
+                go.render(batch);
+                go.sprite.setColor(Color.WHITE);
+            }
+        } else {
+            for (EvoGameObject go : gameObjects) {
+                go.render(batch);
+            }
+        }
+
+        if (paused) {
+            pauseText.draw(batch);
+            batch.setColor(origColor);
         }
     }
 
@@ -198,10 +230,8 @@ public class GameWorld implements Disposable {
 //        return visibleArea.y + visibleArea.height;
 //    }
 
-    public void gameOver() {
-        AbstractScreen screen = Main.getInstance().getCurrentScreen();
-        Main.getInstance().goToMainMenu();
-        screen.dispose();
+    public void pause() {
+        this.paused = !this.paused;
     }
 
     public void registerHandler(String type, EventHandler handler) {
