@@ -28,6 +28,8 @@ public class GameScreen extends AbstractScreen {
 
     private final Vector3 coords = new Vector3();
 
+    private Label pauseText;
+
     protected GameScreen(SpriteBatch batch) {
         super(batch);
 
@@ -53,6 +55,9 @@ public class GameScreen extends AbstractScreen {
                 gameWorld.herb.setTarget(x, y);
             }
         });
+
+//        pauseText = new BitmapFontCache(assets.get("ui/uiskin.json", Skin.class).getFont("default-font"));
+//        pauseText.setText("PAUSE", 100, 100);
     }
 
     @Override
@@ -88,6 +93,11 @@ public class GameScreen extends AbstractScreen {
     }
 
     @Override
+    protected void renderUi() {
+        super.renderUi();
+    }
+
+    @Override
     public void dispose() {
         gameWorld.dispose();
 
@@ -97,46 +107,60 @@ public class GameScreen extends AbstractScreen {
     @Override
     protected void createUI() {
         super.createUI();
-        uiRootTable.setFillParent(false);
-        uiRootTable.setWidth(viewport.getScreenWidth() - viewport.getScreenHeight());
-        Gdx.app.log("UI", "uiRootTable width = " + (viewport.getScreenWidth() - viewport.getScreenHeight()));
-        uiRootTable.setX(viewport.getScreenHeight());
-        Gdx.app.log("UI", "uiRootTable x = " + viewport.getScreenHeight());
-        uiRootTable.setY(500);
 
         final Skin uiSkin = assets.get("ui/uiskin.json", Skin.class);
+
+//        uiRootTable.setFillParent(false);
+        pauseText = new Label("PAUSE", uiSkin);
+        pauseText.setColor(Color.GRAY);
+        pauseText.setFontScale(4);
+        gameWorld.registerHandler("", e -> {
+            // TODO
+            return false;
+        });
+        uiRootTable.add(pauseText).align(Align.center);
+        Table uiTable = new Table();
+//        uiTable.setFillParent(true);
+        uiRootTable.add(uiTable).width(viewport.getScreenWidth() - viewport.getScreenHeight());
+        uiRootTable.row();
+        uiRootTable.add().width(viewport.getScreenHeight());
+//        uiRootTable.setWidth();
+        Gdx.app.log("UI", "uiRootTable width = " + (viewport.getScreenWidth() - viewport.getScreenHeight()));
+//        uiTable.setX(viewport.getScreenHeight());
+        Gdx.app.log("UI", "uiRootTable x = " + viewport.getScreenHeight());
+//        uiTable.setY(500);
 
         Label label = new Label("", uiSkin);
         gameWorld.registerHandler("NewGeneration", e -> {
             label.setText("Generation #" + ((NewGenerationEvent) e).getGenerationNumber());
             return false;
         });
-        uiRootTable.add(label).colspan(5);
+        uiTable.add(label).colspan(5);
 
-        uiRootTable.row().padTop(10);
-        uiRootTable.add(new Label("FOOD", uiSkin)).colspan(5);
+        uiTable.row().padTop(10);
+        uiTable.add(new Label("FOOD", uiSkin)).colspan(5);
 
-        uiRootTable.row();
-        uiRootTable.add(new Label("Count", uiSkin));
-        uiRootTable.add(new Label("from:", uiSkin)).padLeft(15);
+        uiTable.row();
+        uiTable.add(new Label("Count", uiSkin));
+        uiTable.add(new Label("from:", uiSkin)).padLeft(15);
         IntField.IntFieldBuilder intFieldBuilder = IntField.builder()
                 .skin(uiSkin)
                 .minValue(1)
                 .maxValue(1000);
-        uiRootTable.add(intFieldBuilder.text("10").handler(gameWorld.params::setFoodCountFrom).build()).width(50).align(Align.left);
-        uiRootTable.add(new Label("to:", uiSkin)).padLeft(15);
-        uiRootTable.add(intFieldBuilder.text("10").handler(gameWorld.params::setFoodCountTo).build()).width(50).align(Align.left);
+        uiTable.add(intFieldBuilder.text("10").handler(gameWorld.params::setFoodCountFrom).build()).width(50).align(Align.left);
+        uiTable.add(new Label("to:", uiSkin)).padLeft(15);
+        uiTable.add(intFieldBuilder.text("10").handler(gameWorld.params::setFoodCountTo).build()).width(50).align(Align.left);
 
-        uiRootTable.row();
-        uiRootTable.add(new Label("Value", uiSkin));
-        uiRootTable.add(new Label("from:", uiSkin)).padLeft(15);
+        uiTable.row();
+        uiTable.add(new Label("Value", uiSkin));
+        uiTable.add(new Label("from:", uiSkin)).padLeft(15);
         FloatField.FloatFieldBuilder floatFieldBuilder = FloatField.builder()
                 .skin(uiSkin)
                 .minValue(1)
                 .maxValue(50);
-        uiRootTable.add(floatFieldBuilder.text("10").handler(gameWorld.params::setFoodValueFrom).build()).width(50).align(Align.left);
-        uiRootTable.add(new Label("to:", uiSkin)).padLeft(15);
-        uiRootTable.add(floatFieldBuilder.text("10").handler(gameWorld.params::setFoodValueTo).build()).width(50).align(Align.left);
+        uiTable.add(floatFieldBuilder.text("10").handler(gameWorld.params::setFoodValueFrom).build()).width(50).align(Align.left);
+        uiTable.add(new Label("to:", uiSkin)).padLeft(15);
+        uiTable.add(floatFieldBuilder.text("10").handler(gameWorld.params::setFoodValueTo).build()).width(50).align(Align.left);
 
         TextButton generateBtn = new TextButton("Generate", uiSkin);
         generateBtn.addListener(new ClickListener() {
@@ -145,8 +169,8 @@ public class GameScreen extends AbstractScreen {
                 gameWorld.newGeneration();
             }
         });
-        uiRootTable.row();
-        uiRootTable.add(generateBtn).colspan(5).padTop(20);
+        uiTable.row();
+        uiTable.add(generateBtn).colspan(5).padTop(20);
 
         stage.addListener(new InputListener() {
             @Override

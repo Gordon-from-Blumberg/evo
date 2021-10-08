@@ -40,8 +40,8 @@ public class GameWorld implements Disposable {
     public float width, height;
 
     private boolean paused, started;
+
     private final Color pauseColor = Color.GRAY;
-    private final BitmapFontCache pauseText;
 
     private NinePatch background;
 
@@ -56,9 +56,6 @@ public class GameWorld implements Disposable {
                         .findRegion("world-background"),
                 1, 1, 1, 1
         );
-
-        pauseText = new BitmapFontCache(assets.get("ui/uiskin.json", Skin.class).getFont("default-font"));
-        pauseText.setText("PAUSE", 100, 100);
     }
 
     public void initialize(float size) {
@@ -205,7 +202,7 @@ public class GameWorld implements Disposable {
         }
 
         if (paused) {
-            pauseText.draw(batch);
+//            pauseText.draw(batch);
             batch.setColor(origColor);
         }
     }
