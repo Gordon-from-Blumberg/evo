@@ -21,14 +21,13 @@ import com.gordonfromblumberg.games.core.common.ui.FloatField;
 import com.gordonfromblumberg.games.core.common.ui.IntField;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 import com.gordonfromblumberg.games.core.evo.event.NewGenerationEvent;
+import com.gordonfromblumberg.games.core.evo.event.PauseEvent;
 
 public class GameScreen extends AbstractScreen {
     TextureRegion background;
     private GameWorld gameWorld;
 
     private final Vector3 coords = new Vector3();
-
-    private Label pauseText;
 
     protected GameScreen(SpriteBatch batch) {
         super(batch);
@@ -111,19 +110,22 @@ public class GameScreen extends AbstractScreen {
         final Skin uiSkin = assets.get("ui/uiskin.json", Skin.class);
 
 //        uiRootTable.setFillParent(false);
-        pauseText = new Label("PAUSE", uiSkin);
-        pauseText.setColor(Color.GRAY);
-        pauseText.setFontScale(4);
-        gameWorld.registerHandler("", e -> {
-            // TODO
-            return false;
+        Image pauseImage = new Image(assets.get("image/texture_pack.atlas", TextureAtlas.class).findRegion("pause"));
+        pauseImage.setColor(Color.GRAY);
+        pauseImage.setVisible(false);
+        gameWorld.registerHandler("Pause", e -> {
+            PauseEvent pe = (PauseEvent) e;
+            pauseImage.setVisible(pe.isPaused());
+            return true;
         });
-        uiRootTable.add(pauseText).align(Align.center);
-        Table uiTable = new Table();
-//        uiTable.setFillParent(true);
-        uiRootTable.add(uiTable).width(viewport.getScreenWidth() - viewport.getScreenHeight());
-        uiRootTable.row();
+
         uiRootTable.add().width(viewport.getScreenHeight());
+        uiRootTable.add().width(viewport.getScreenWidth() - viewport.getScreenHeight());
+        uiRootTable.row();
+
+        uiRootTable.add(pauseImage).align(Align.center);
+        Table uiTable = new Table();
+        uiRootTable.add(uiTable);
 //        uiRootTable.setWidth();
         Gdx.app.log("UI", "uiRootTable width = " + (viewport.getScreenWidth() - viewport.getScreenHeight()));
 //        uiTable.setX(viewport.getScreenHeight());

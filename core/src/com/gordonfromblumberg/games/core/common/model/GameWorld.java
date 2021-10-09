@@ -19,6 +19,7 @@ import com.gordonfromblumberg.games.core.common.screens.AbstractScreen;
 import com.gordonfromblumberg.games.core.evo.WorldParams;
 import com.gordonfromblumberg.games.core.evo.creature.Creature;
 import com.gordonfromblumberg.games.core.evo.event.NewGenerationEvent;
+import com.gordonfromblumberg.games.core.evo.event.PauseEvent;
 import com.gordonfromblumberg.games.core.evo.food.Food;
 import com.gordonfromblumberg.games.core.evo.model.EvoGameObject;
 import com.gordonfromblumberg.games.core.evo.physics.CreatureMovingStrategy;
@@ -171,8 +172,6 @@ public class GameWorld implements Disposable {
 
             pred.setTarget(herb.position.x, herb.position.y);
 
-            eventProcessor.process();
-
             if (time > 2) {
                 time = 0;
                 Gdx.app.log("GameWorld", "Game objects: current count = " + gameObjects.size + ", max count = " + maxGameObjectCount);
@@ -180,6 +179,8 @@ public class GameWorld implements Disposable {
                 Gdx.app.log("Max acceleration", "Herb = " + ((CreatureMovingStrategy) herb.movingStrategy).maxAccMag + ", pred = " + ((CreatureMovingStrategy) pred.movingStrategy).maxAccMag);
             }
         }
+
+        eventProcessor.process();
     }
 
     public void render(Batch batch) {
@@ -229,6 +230,9 @@ public class GameWorld implements Disposable {
 
     public void pause() {
         this.paused = !this.paused;
+        PauseEvent pe = PauseEvent.getInstance();
+        pe.setPaused(this.paused);
+        eventProcessor.push(pe);
     }
 
     public void registerHandler(String type, EventHandler handler) {
