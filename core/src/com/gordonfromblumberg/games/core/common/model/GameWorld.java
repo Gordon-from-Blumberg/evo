@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -15,11 +14,9 @@ import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.event.Event;
 import com.gordonfromblumberg.games.core.common.event.EventHandler;
 import com.gordonfromblumberg.games.core.common.event.EventProcessor;
-import com.gordonfromblumberg.games.core.common.screens.AbstractScreen;
 import com.gordonfromblumberg.games.core.evo.WorldParams;
 import com.gordonfromblumberg.games.core.evo.creature.Creature;
 import com.gordonfromblumberg.games.core.evo.event.NewGenerationEvent;
-import com.gordonfromblumberg.games.core.evo.event.PauseEvent;
 import com.gordonfromblumberg.games.core.evo.food.Food;
 import com.gordonfromblumberg.games.core.evo.model.EvoGameObject;
 import com.gordonfromblumberg.games.core.evo.physics.CreatureMovingStrategy;
@@ -60,6 +57,7 @@ public class GameWorld implements Disposable {
     }
 
     public void initialize(float size) {
+        params.setDefault();
         final float baseSize = Main.CREATURE_SIZE;
 
         setSize(size);
@@ -139,6 +137,18 @@ public class GameWorld implements Disposable {
             food.setSize(Main.CREATURE_SIZE * 0.5f, Main.CREATURE_SIZE * 0.5f);
             addGameObject(food);
         }
+    }
+
+    public void simulate() {
+        // TODO free simulation
+    }
+
+    public void simulate(int generationNumber) {
+        // TODO free simulation
+    }
+
+    public void requestStop() {
+        // TODO
     }
 
     public void setSize(float worldSize) {
@@ -228,11 +238,8 @@ public class GameWorld implements Disposable {
 //        return visibleArea.y + visibleArea.height;
 //    }
 
-    public void pause() {
-        this.paused = !this.paused;
-        PauseEvent pe = PauseEvent.getInstance();
-        pe.setPaused(this.paused);
-        eventProcessor.push(pe);
+    public boolean pause() {
+        return this.paused = !this.paused;
     }
 
     public void registerHandler(String type, EventHandler handler) {

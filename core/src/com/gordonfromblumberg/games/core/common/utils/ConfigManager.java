@@ -23,6 +23,10 @@ public class ConfigManager {
         loadConfig(CONFIG_FILE);
     }
 
+    public String getString(String property) {
+        return configProperties.get(property);
+    }
+
     public int getInteger(String propertyName) {
         String property = configProperties.get(propertyName);
         if (property != null) {

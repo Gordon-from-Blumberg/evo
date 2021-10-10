@@ -7,27 +7,26 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.model.GameWorld;
+import com.gordonfromblumberg.games.core.common.ui.ButtonConfig;
 import com.gordonfromblumberg.games.core.common.ui.FloatField;
 import com.gordonfromblumberg.games.core.common.ui.IntField;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
+import com.gordonfromblumberg.games.core.common.ui.UIUtils;
 import com.gordonfromblumberg.games.core.evo.event.NewGenerationEvent;
-import com.gordonfromblumberg.games.core.evo.event.PauseEvent;
 
 public class GameScreen extends AbstractScreen {
     TextureRegion background;
-    private GameWorld gameWorld;
+    private final GameWorld gameWorld;
 
-    private final Vector3 coords = new Vector3();
+    private final Color pauseColor = Color.LIGHT_GRAY;
 
     protected GameScreen(SpriteBatch batch) {
         super(batch);
@@ -46,17 +45,6 @@ public class GameScreen extends AbstractScreen {
 
         gameWorld.initialize(viewport.getWorldHeight());
         gameWorld.newGeneration();
-
-        stage.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.log("Target", "Target = " + x + ", " + y);
-                gameWorld.herb.setTarget(x, y);
-            }
-        });
-
-//        pauseText = new BitmapFontCache(assets.get("ui/uiskin.json", Skin.class).getFont("default-font"));
-//        pauseText.setText("PAUSE", 100, 100);
     }
 
     @Override
@@ -107,30 +95,26 @@ public class GameScreen extends AbstractScreen {
     protected void createUI() {
         super.createUI();
 
-        final Skin uiSkin = assets.get("ui/uiskin.json", Skin.class);
+        final ConfigManager config = AbstractFactory.getInstance().configManager();
 
-//        uiRootTable.setFillParent(false);
-        Image pauseImage = new Image(assets.get("image/texture_pack.atlas", TextureAtlas.class).findRegion("pause"));
-        pauseImage.setColor(Color.GRAY);
-        pauseImage.setVisible(false);
-        gameWorld.registerHandler("Pause", e -> {
-            PauseEvent pe = (PauseEvent) e;
-            pauseImage.setVisible(pe.isPaused());
-            return true;
-        });
-
+        // create two main columns: left over game world and right for the UI itself
         uiRootTable.add().width(viewport.getScreenHeight());
         uiRootTable.add().width(viewport.getScreenWidth() - viewport.getScreenHeight());
         uiRootTable.row();
 
+        final Skin uiSkin = assets.get("ui/uiskin.json", Skin.class);
+
+        // over game UI
+        final Image pauseImage = new Image(assets.get("image/texture_pack.atlas", TextureAtlas.class).findRegion("pause"));
+        pauseImage.setColor(pauseColor);
+        pauseImage.setVisible(false);
         uiRootTable.add(pauseImage).align(Align.center);
+
+        // right column UI
         Table uiTable = new Table();
+        if (Main.DEBUG_UI)
+            uiTable.debugAll();
         uiRootTable.add(uiTable);
-//        uiRootTable.setWidth();
-        Gdx.app.log("UI", "uiRootTable width = " + (viewport.getScreenWidth() - viewport.getScreenHeight()));
-//        uiTable.setX(viewport.getScreenHeight());
-        Gdx.app.log("UI", "uiRootTable x = " + viewport.getScreenHeight());
-//        uiTable.setY(500);
 
         Label label = new Label("", uiSkin);
         gameWorld.registerHandler("NewGeneration", e -> {
@@ -139,46 +123,120 @@ public class GameScreen extends AbstractScreen {
         });
         uiTable.add(label).colspan(5);
 
+        // FOOD
         uiTable.row().padTop(10);
         uiTable.add(new Label("FOOD", uiSkin)).colspan(5);
 
         uiTable.row();
         uiTable.add(new Label("Count", uiSkin));
-        uiTable.add(new Label("from:", uiSkin)).padLeft(15);
+        uiTable.add(new Label("from:", uiSkin)).padLeft(15).padRight(5).align(Align.right);
         IntField.IntFieldBuilder intFieldBuilder = IntField.builder()
                 .skin(uiSkin)
                 .minValue(1)
                 .maxValue(1000);
-        uiTable.add(intFieldBuilder.text("10").handler(gameWorld.params::setFoodCountFrom).build()).width(50).align(Align.left);
-        uiTable.add(new Label("to:", uiSkin)).padLeft(15);
-        uiTable.add(intFieldBuilder.text("10").handler(gameWorld.params::setFoodCountTo).build()).width(50).align(Align.left);
+        uiTable.add(intFieldBuilder.text(config.getString("game.world.food.count.from"))
+                .handler(gameWorld.params::setFoodCountFrom)
+                .build()
+        ).width(50).align(Align.left);
+        uiTable.add(new Label("to:", uiSkin)).padLeft(15).padRight(5);
+        uiTable.add(intFieldBuilder.text(config.getString("game.world.food.count.to"))
+                .handler(gameWorld.params::setFoodCountTo)
+                .build()
+        ).width(50).align(Align.left);
 
-        uiTable.row();
+        uiTable.row().padTop(2);
         uiTable.add(new Label("Value", uiSkin));
-        uiTable.add(new Label("from:", uiSkin)).padLeft(15);
+        uiTable.add(new Label("from:", uiSkin)).padLeft(15).padRight(5).align(Align.right);
         FloatField.FloatFieldBuilder floatFieldBuilder = FloatField.builder()
                 .skin(uiSkin)
                 .minValue(1)
                 .maxValue(50);
-        uiTable.add(floatFieldBuilder.text("10").handler(gameWorld.params::setFoodValueFrom).build()).width(50).align(Align.left);
-        uiTable.add(new Label("to:", uiSkin)).padLeft(15);
-        uiTable.add(floatFieldBuilder.text("10").handler(gameWorld.params::setFoodValueTo).build()).width(50).align(Align.left);
+        uiTable.add(floatFieldBuilder.text(config.getString("game.world.food.value.from"))
+                .handler(gameWorld.params::setFoodValueFrom)
+                .build()
+        ).width(50).align(Align.left);
+        uiTable.add(new Label("to:", uiSkin)).padLeft(15).padRight(5);
+        uiTable.add(floatFieldBuilder.text(config.getString("game.world.food.value.to"))
+                .handler(gameWorld.params::setFoodValueTo)
+                .build()
+        ).width(50).align(Align.left);
 
-        TextButton generateBtn = new TextButton("Generate", uiSkin);
-        generateBtn.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                gameWorld.newGeneration();
-            }
-        });
+        // CREATURES
+        uiTable.row().padTop(10);
+        uiTable.add(new Label("CREATURES", uiSkin)).colspan(5);
+
         uiTable.row();
-        uiTable.add(generateBtn).colspan(5).padTop(20);
+        uiTable.add(new Label("Count of the first generation", uiSkin)).colspan(2).padRight(5);
+        uiTable.add(intFieldBuilder.text(config.getString("game.world.creatures.count"))
+                .maxValue(10)
+                .handler(gameWorld.params::setCreaturesCount)
+                .build()
+        ).width(50).align(Align.left);
+
+        // GENERATE
+        uiTable.row().padTop(20);
+        uiTable.add(UIUtils.textButton("Generate",
+                uiSkin,
+                gameWorld::newGeneration,
+                ButtonConfig.toggleDisable(gameWorld, "SimulationStarted", "SimulationFinished")
+        )).colspan(2).width(200);
+
+        // SIMULATION
+        uiTable.row().padTop(20);
+        uiTable.add(new Label("SIMULATION", uiSkin)).colspan(5);
+        // ONE GENERATION
+        uiTable.row().padTop(2);
+        uiTable.add(UIUtils.textButton("One generation",
+                uiSkin,
+                () -> gameWorld.simulate(1),
+                ButtonConfig.toggleDisable(gameWorld, "SimulationStarted", "SimulationFinished")
+        )).colspan(2).width(200);
+
+        // SIMULATE N GENERATIONS
+        uiTable.row().padTop(2);
+        final String generationCount = config.getString("game.world.generation.count");
+        final TextButton simulateSomeGensBtn = UIUtils.textButton("Simulate " + generationCount + " generations",
+                uiSkin,
+                () -> gameWorld.simulate(gameWorld.params.getGenerationCount()),
+                ButtonConfig.toggleDisable(gameWorld, "SimulationStarted", "SimulationFinished")
+        );
+        uiTable.add(simulateSomeGensBtn).colspan(2).width(200);
+        uiTable.add(intFieldBuilder.text(generationCount)
+                .maxValue(100)
+                .handler(n -> {
+                    gameWorld.params.setGenerationCount(n);
+                    simulateSomeGensBtn.setText("Simulate " + n + " generations");
+                })
+                .build()
+        ).width(50);
+
+        // FREE SIMULATION
+        uiTable.row().padTop(2);
+        uiTable.add(UIUtils.textButton("Free simulation",
+                uiSkin,
+                gameWorld::simulate,
+                ButtonConfig.toggleDisable(gameWorld, "SimulationStarted", "SimulationFinished")
+        )).colspan(2).width(200);
+
+        // PAUSE AND STOP
+        uiTable.row().padTop(15);
+        uiTable.add(UIUtils.textButton("Stop",
+                uiSkin,
+                gameWorld::requestStop,
+                ButtonConfig.toggleDisable(gameWorld, "SimulationFinished", "SimulationStarted")
+        )).width(90);
+
+        uiTable.add(UIUtils.textButton("Pause",
+                uiSkin,
+                () -> pauseImage.setVisible(gameWorld.pause()),
+                null
+        )).width(90);
 
         stage.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if (keycode == Input.Keys.SPACE) {
-                    gameWorld.pause();
+                    pauseImage.setVisible(gameWorld.pause());
                     return true;
                 }
                 return false;
