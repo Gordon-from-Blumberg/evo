@@ -214,7 +214,7 @@ public class GameScreen extends AbstractScreen {
         uiTable.row().padTop(2);
         uiTable.add(UIUtils.textButton("Free simulation",
                 uiSkin,
-                gameWorld::simulate,
+                () -> gameWorld.simulate(Integer.MAX_VALUE),
                 ButtonConfig.toggleDisable(gameWorld, "SimulationStarted", "SimulationFinished")
         )).colspan(2).width(200);
 

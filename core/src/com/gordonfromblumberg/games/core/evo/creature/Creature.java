@@ -24,6 +24,7 @@ public class Creature extends EvoGameObject {
 
     private final DNA dna = new DNA();
     private final IntMap[] stateParams = new IntMap[State.values().length];
+    private Creature parent;
 
     private State state;
     private boolean isPredator;
@@ -82,12 +83,17 @@ public class Creature extends EvoGameObject {
                 || !isPredator && go instanceof Food;
     }
 
+    public boolean readyToReproduce() {
+        return satiety >= offspringSatiety;
+    }
+
     public void produceOffspring() {
         for (int i = 0; i < offspringCount; i++) {
             Creature child = pool.obtain();
             dna.copy(child.dna);
             child.dna.mutate();
             child.init();
+            child.parent = this;
             gameWorld.addGameObject(child);
         }
     }
@@ -226,5 +232,11 @@ public class Creature extends EvoGameObject {
 
     public void release() {
         pool.free(this);
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        parent = null;
     }
 }

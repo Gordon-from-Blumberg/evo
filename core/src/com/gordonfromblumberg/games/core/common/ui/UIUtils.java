@@ -13,7 +13,8 @@ public class UIUtils {
         button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                onClickListener.run();
+                if (!button.isDisabled())
+                    onClickListener.run();
             }
         });
         

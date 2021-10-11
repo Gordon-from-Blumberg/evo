@@ -14,6 +14,7 @@ import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.event.Event;
 import com.gordonfromblumberg.games.core.common.event.EventHandler;
 import com.gordonfromblumberg.games.core.common.event.EventProcessor;
+import com.gordonfromblumberg.games.core.common.event.SimpleEvent;
 import com.gordonfromblumberg.games.core.evo.WorldParams;
 import com.gordonfromblumberg.games.core.evo.creature.Creature;
 import com.gordonfromblumberg.games.core.evo.event.NewGenerationEvent;
@@ -35,9 +36,10 @@ public class GameWorld implements Disposable {
     private final EventProcessor eventProcessor = new EventProcessor();
 
     int generation;
+    int generationsToSimulate;
     public float width, height;
 
-    private boolean paused, started;
+    private boolean paused, started, stopRequested;
 
     private final Color pauseColor = Color.GRAY;
 
@@ -104,10 +106,11 @@ public class GameWorld implements Disposable {
     public void newGeneration() {
         generation++;
         generateFood();
+        produceOffspring();
+        placeCreatures();
         NewGenerationEvent event = NewGenerationEvent.getInstance();
         event.setGenerationNumber(generation);
         eventProcessor.push(event);
-        started = true;
     }
 
     public void generateFood() {
@@ -139,16 +142,33 @@ public class GameWorld implements Disposable {
         }
     }
 
-    public void simulate() {
-        // TODO free simulation
+    void produceOffspring() {
+        for (int i = 0, size = gameObjects.size; i < size; i++) {
+            EvoGameObject ego;
+            if ((ego = gameObjects.get(i)) instanceof Creature && ((Creature) ego).readyToReproduce()) {
+                ((Creature) ego).produceOffspring();
+            }
+        }
+    }
+
+    void placeCreatures() {
+        // TODO
     }
 
     public void simulate(int generationNumber) {
-        // TODO free simulation
+        this.generationsToSimulate = generationNumber;
+        start();
+    }
+
+    private void start() {
+        if (generationsToSimulate-- > 0) {
+            this.started = true;
+            eventProcessor.push(SimpleEvent.of("SimulationStarted"));
+        }
     }
 
     public void requestStop() {
-        // TODO
+        this.stopRequested = true;
     }
 
     public void setSize(float worldSize) {

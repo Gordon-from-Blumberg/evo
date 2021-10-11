@@ -1,9 +1,11 @@
 package com.gordonfromblumberg.games.core.common.event;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IdentityMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Queue;
+import com.gordonfromblumberg.games.core.common.Main;
 
 @SuppressWarnings("unchecked")
 public class EventProcessor {
@@ -31,6 +33,10 @@ public class EventProcessor {
         while (queue.notEmpty()) {
             final Event event = queue.removeFirst();
             final Array<EventHandler> handlerList = handlers.get(event.getType());
+
+            if (Main.DEBUG)
+                Gdx.app.log("Events", "Process event '" + event.getType() + "', registered handlers " + handlerList.size);
+
             if (handlerList != null) {
                 for (EventHandler handler : handlerList) {
                     if (handler.handle(event)) {
