@@ -1,9 +1,10 @@
-package com.gordonfromblumberg.games.core.evo;
+package com.gordonfromblumberg.games.core.evo.world;
 
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 
 public class WorldParams {
+    private int worldWidth, worldHeight;
     private int foodCountFrom, foodCountTo;
     private float foodValueFrom, foodValueTo;
     private int creaturesCount;
@@ -11,12 +12,30 @@ public class WorldParams {
 
     public void setDefault() {
         ConfigManager config = AbstractFactory.getInstance().configManager();
+        worldWidth = config.getInteger("game.world.width");
+        worldHeight = config.getInteger("game.world.height");
         foodCountFrom = config.getInteger("game.world.food.count.from");
         foodCountTo = config.getInteger("game.world.food.count.to");
         foodValueFrom = config.getFloat("game.world.food.value.from");
         foodValueTo = config.getFloat("game.world.food.value.from");
         creaturesCount = config.getInteger("game.world.creatures.count");
         generationCount = config.getInteger("game.world.generation.count");
+    }
+
+    public int getWorldWidth() {
+        return worldWidth;
+    }
+
+    public void setWorldWidth(int worldWidth) {
+        this.worldWidth = worldWidth;
+    }
+
+    public int getWorldHeight() {
+        return worldHeight;
+    }
+
+    public void setWorldHeight(int worldHeight) {
+        this.worldHeight = worldHeight;
     }
 
     public int getFoodCountFrom() {

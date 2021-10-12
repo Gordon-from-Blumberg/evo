@@ -51,7 +51,7 @@ public class GameScreen extends AbstractScreen {
     protected void createWorldViewport() {
         final ConfigManager configManager = AbstractFactory.getInstance().configManager();
         Main.CREATURE_SIZE = configManager.getFloat("game.creature.size");
-        final float worldWidth = configManager.getFloat("game.size") * Main.CREATURE_SIZE;
+        final float worldWidth = configManager.getInteger("game.world.width") * Main.CREATURE_SIZE;
         final float minRatio = configManager.getFloat("minRatio");
         final float maxRatio = configManager.getFloat("maxRatio");
         final float minWorldHeight = worldWidth / maxRatio;
