@@ -111,8 +111,8 @@ public enum State {
     MOVEMENT_TO_HOME {
         @Override
         public void enter(Creature creature) {
-            float worldWidth = creature.gameWorld.width;
-            float worldHeight = creature.gameWorld.height;
+            float worldWidth = creature.gameWorld.width * Main.CREATURE_SIZE;
+            float worldHeight = creature.gameWorld.height * Main.CREATURE_SIZE;
             float x = creature.position.x;
             float y = creature.position.y;
             float halfSize = creature.getSize() * Main.CREATURE_SIZE / 2;

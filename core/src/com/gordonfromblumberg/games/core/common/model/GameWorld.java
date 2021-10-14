@@ -14,6 +14,8 @@ import com.gordonfromblumberg.games.core.common.event.Event;
 import com.gordonfromblumberg.games.core.common.event.EventHandler;
 import com.gordonfromblumberg.games.core.common.event.EventProcessor;
 import com.gordonfromblumberg.games.core.common.event.SimpleEvent;
+import com.gordonfromblumberg.games.core.common.utils.RandomUtils;
+import com.gordonfromblumberg.games.core.evo.world.SpawnPoint;
 import com.gordonfromblumberg.games.core.evo.world.WorldParams;
 import com.gordonfromblumberg.games.core.evo.creature.Creature;
 import com.gordonfromblumberg.games.core.evo.event.NewGenerationEvent;
@@ -36,7 +38,12 @@ public class GameWorld implements Disposable {
 
     int generation;
     int generationsToSimulate;
-    public float width, height;
+    // world size of viewport
+    float screenWidth, screenHeight;
+    public int width, height;
+
+    final Array<SpawnPoint> spawnPoints = new Array<>(30 * 4);
+    int spawnPointCount;
 
     private boolean paused, started, stopRequested;
 
@@ -57,11 +64,13 @@ public class GameWorld implements Disposable {
         );
     }
 
-    public void initialize(float size) {
+    public void initialize(int width, int height, float screenWidth, float screenHeight) {
         params.setDefault();
         final float baseSize = Main.CREATURE_SIZE;
 
-        setSize(size);
+        this.screenWidth = screenWidth;
+        this.screenHeight = screenHeight;
+        setSize(width, height);
 
         herb = Creature.getInstance();
         herb.setRegion("herbivorous");
@@ -78,7 +87,7 @@ public class GameWorld implements Disposable {
 
         herb2 = Creature.getInstance();
         herb2.setRegion("herbivorous");
-        herb2.setPosition(size - baseSize / 2, size - baseSize / 2);
+        herb2.setPosition(width * Main.CREATURE_SIZE - baseSize / 2, height * Main.CREATURE_SIZE - baseSize / 2);
         herb2.setSize(baseSize, baseSize);
         herb2.setMaxVelocityForward(baseSize * 5);
         herb2.setMaxVelocityBackward(baseSize * 2);
@@ -91,7 +100,7 @@ public class GameWorld implements Disposable {
 
         pred = Creature.getInstance();
         pred.setRegion("predator");
-        pred.setPosition(size - baseSize / 2, baseSize / 2);
+        pred.setPosition(width * Main.CREATURE_SIZE - baseSize / 2, baseSize / 2);
         pred.setSize(baseSize, baseSize);
         pred.setMaxVelocityForward(baseSize * 5.5f);
         pred.setMaxVelocityBackward(baseSize * 2);
@@ -105,7 +114,10 @@ public class GameWorld implements Disposable {
     public void newGeneration() {
         generation++;
         generateFood();
-        produceOffspring();
+        if (generation == 1)
+            createFirstGeneration();
+        else
+            produceOffspring();
         placeCreatures();
         NewGenerationEvent event = NewGenerationEvent.getInstance();
         event.setGenerationNumber(generation);
@@ -125,10 +137,10 @@ public class GameWorld implements Disposable {
             }
         }
 
-        final float fromX = 64;
-        final float toX = width - 64;
-        final float fromY = 64;
-        final float toY = height - 64;
+        final float fromX = getSpawnPointWidth() + Main.CREATURE_SIZE / 2;
+        final float toX = screenWidth - fromX;
+        final float fromY = getSpawnPointHeight() + Main.CREATURE_SIZE / 2;
+        final float toY = screenHeight - fromY;
 
         final int foodCount = nextInt(params.getFoodCountFrom(), params.getFoodCountTo());
         for (int i = 0; i < foodCount; i++) {
@@ -141,6 +153,10 @@ public class GameWorld implements Disposable {
         }
     }
 
+    void createFirstGeneration() {
+
+    }
+
     void produceOffspring() {
         for (int i = 0, size = gameObjects.size; i < size; i++) {
             EvoGameObject ego;
@@ -151,7 +167,35 @@ public class GameWorld implements Disposable {
     }
 
     void placeCreatures() {
-        // TODO
+        int maxCount, creatureCount = 0;
+        for (EvoGameObject go : gameObjects) {
+            if (go instanceof Creature)
+                creatureCount++;
+        }
+
+        maxCount = creatureCount / spawnPointCount + 1;
+        Gdx.app.log("Spawn", "Creatures count = " + creatureCount
+                + ", spawnPointCount = " + spawnPointCount + ", max count per spawn point = " + maxCount);
+
+        for (EvoGameObject go : gameObjects) {
+            if (go instanceof Creature) {
+                Creature creature = (Creature) go;
+
+                boolean placed = false;
+                while (!placed) {
+                    int i = RandomUtils.nextInt(spawnPointCount);
+                    SpawnPoint sp = spawnPoints.get(i);
+                    if (sp.getCreatureCount() < maxCount) {
+                        sp.addCreature(creature);
+                        placed = true;
+
+                        if (Main.DEBUG)
+                            Gdx.app.log("Spawn", "Spawn " + creature + " at point #" + i
+                                    + " with x = " + sp.getX() + ", y = " + sp.getY());
+                    }
+                }
+            }
+        }
     }
 
     public void simulate(int generationNumber) {
@@ -170,9 +214,42 @@ public class GameWorld implements Disposable {
         this.stopRequested = true;
     }
 
-    public void setSize(float worldSize) {
-        width = worldSize;
-        height = worldSize;
+    void setupSpawnPoints() {
+        final float pointWidth = getSpawnPointWidth(), pointHeight = getSpawnPointHeight();
+        final int countX = width / 2 - 2, countY = height / 2 - 2;
+        final int count = (countX + countY) * 2;
+        this.spawnPointCount = count;
+
+        Gdx.app.log("Spawn", "Point size = " + pointWidth + ", " + pointHeight
+                + ", count of points = " + count + ", for x = " + countX + ", for y = " + countY);
+
+        for (int i = 0; i < count; i++) {
+            SpawnPoint sp;
+            if (i < spawnPoints.size) {
+                sp = spawnPoints.get(i);
+                sp.clear();
+            } else {
+                sp = new SpawnPoint();
+                spawnPoints.add(sp);
+            }
+
+            if (i < countX) {
+                sp.setSpawnArea((1 + i) * pointWidth, 0, pointWidth, pointHeight);
+            } else if (i < countX + countY) {
+                sp.setSpawnArea(countX * pointWidth, (1 + i - countX) * pointHeight, pointWidth, pointHeight);
+            } else if (i < 2 * countX + countY) {
+                sp.setSpawnArea((1 + countX + countY - i) * pointWidth, countY * pointHeight, pointWidth, pointHeight);
+            } else {
+                sp.setSpawnArea(0, (1 + 2 * countX + countY - i) * pointHeight, pointWidth, pointHeight);
+            }
+        }
+    }
+
+    public void setSize(int worldWidth, int worldHeight) {
+        width = worldWidth;
+        height = worldHeight;
+
+        setupSpawnPoints();
     }
 
     public void addGameObject(EvoGameObject gameObject) {
@@ -217,7 +294,9 @@ public class GameWorld implements Disposable {
         if (paused)
             batch.setColor(pauseColor);
 
-        background.draw(batch, 0, 0, 0, 0, 64 * width, 64 * height, 1f/64, 1f/64, 0);
+        background.draw(batch, 0, 0, 0, 0,
+                Main.CREATURE_SIZE * screenWidth, Main.CREATURE_SIZE * screenHeight,
+                1f / Main.CREATURE_SIZE, 1f / Main.CREATURE_SIZE, 0);
 
         if (paused) {
             for (EvoGameObject go : gameObjects) {
@@ -256,6 +335,14 @@ public class GameWorld implements Disposable {
 //    public float getMaxVisibleY() {
 //        return visibleArea.y + visibleArea.height;
 //    }
+
+    private float getSpawnPointWidth() {
+        return screenWidth / (2 * width);
+    }
+
+    private float getSpawnPointHeight() {
+        return screenHeight / (2 * height);
+    }
 
     public boolean pause() {
         return this.paused = !this.paused;

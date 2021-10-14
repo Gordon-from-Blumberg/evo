@@ -7,3 +7,4 @@
 - \- Statistic (count of creatures, survived ones, max / min average size / velocity / sense)
 - \- Save / load generation and settings
 - \- EATING state
+- \- Scrolling and zoom

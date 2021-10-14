@@ -5,6 +5,10 @@ import java.util.Random;
 public class RandomUtils {
     private static final Random RAND = new Random();
 
+    public static int nextInt(int to) {
+        return RAND.nextInt(to);
+    }
+
     public static int nextInt(int from, int to) {
         return from == to ? from : from + RAND.nextInt(to - from);
     }

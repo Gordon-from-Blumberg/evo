@@ -43,7 +43,9 @@ public class GameScreen extends AbstractScreen {
                 .get("image/texture_pack.atlas", TextureAtlas.class)
                 .findRegion("background");
 
-        gameWorld.initialize(viewport.getWorldHeight());
+        final ConfigManager configManager = AbstractFactory.getInstance().configManager();
+        gameWorld.initialize(configManager.getInteger("game.world.width"), configManager.getInteger("game.world.height"),
+                viewport.getWorldHeight(), viewport.getWorldHeight());
         gameWorld.newGeneration();
     }
 

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool;
+import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.model.GameObject;
 import com.gordonfromblumberg.games.core.evo.food.Food;
@@ -108,8 +109,8 @@ public class Creature extends EvoGameObject {
             if (velocity.x < 0)
                 velocity.x = 0;
         }
-        if (position.x > gameWorld.width - halfSize) {
-            position.x = gameWorld.width - halfSize;
+        if (position.x > gameWorld.width * Main.CREATURE_SIZE - halfSize) {
+            position.x = gameWorld.width * Main.CREATURE_SIZE - halfSize;
             if (velocity.x > 0)
                 velocity.x = 0;
         }
@@ -118,8 +119,8 @@ public class Creature extends EvoGameObject {
             if (velocity.y < 0)
                 velocity.y = 0;
         }
-        if (position.y > gameWorld.height - halfSize) {
-            position.y = gameWorld.height - halfSize;
+        if (position.y > gameWorld.height * Main.CREATURE_SIZE - halfSize) {
+            position.y = gameWorld.height * Main.CREATURE_SIZE - halfSize;
             if (velocity.y > 0)
                 velocity.y = 0;
         }
