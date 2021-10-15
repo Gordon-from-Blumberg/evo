@@ -48,9 +48,9 @@ public enum State {
             float delay = (float) stateParams.get(0) - dt;
             final Vector2 position = creature.position;
             if (delay <= 0) {
-                temp.setToRandomDirection().scl(Main.CREATURE_SIZE * RADIUS);
+                temp.setToRandomDirection().scl(RADIUS);
                 temp2.set(creature.velocity)
-                        .setLength(Main.CREATURE_SIZE * DIST)
+                        .setLength(DIST)
                         .add(position)
                         .add(temp);
                 creature.setTarget(temp2.x, temp2.y);
@@ -58,7 +58,7 @@ public enum State {
             }
             stateParams.put(0, delay);
 
-            final float radius2 = (float) Math.pow(creature.getSenseRadius() * Main.CREATURE_SIZE, 2);
+            final float radius2 = (float) Math.pow(creature.getSenseRadius(), 2);
             EvoGameObject target = null;
             float minDist2 = Float.MAX_VALUE;
             Array<EvoGameObject> foods = creature.gameWorld.getGameObjects();
@@ -70,12 +70,12 @@ public enum State {
                         minDist2 = dist2;
                         target = food;
                     }
-
-                    if (target != null && minDist2 <= radius2) {
-                        creature.setTarget(target);
-                        creature.setState(MOVEMENT_TO_FOOD);
-                    }
                 }
+            }
+
+            if (target != null && minDist2 <= radius2) {
+                creature.setTarget(target);
+                creature.setState(MOVEMENT_TO_FOOD);
             }
         }
     },
@@ -94,7 +94,7 @@ public enum State {
             } else {
                 // TODO: check food has not been eaten
                 EvoGameObject target = (EvoGameObject) creature.getTarget();
-                float dist = (creature.getSize() + target.getSize()) * Main.CREATURE_SIZE * 0.5f * 0.8f;
+                float dist = (creature.getSize() + target.getSize()) * 0.5f * 0.8f;
 //                Gdx.app.log("MOVEMENT_TO_FOOD", "Creature size = " + creature.getSize() + ", target = " + target.getSize() + ", dist = " + dist);
                 if (target.position.dst2(creature.position) <= dist * dist) {
                     Gdx.app.log("MOVEMENT_TO_FOOD", "Creature #" + creature.getId() + " eats food, real dist = " + target.position.dst(creature.position));
@@ -111,11 +111,11 @@ public enum State {
     MOVEMENT_TO_HOME {
         @Override
         public void enter(Creature creature) {
-            float worldWidth = creature.gameWorld.width * Main.CREATURE_SIZE;
-            float worldHeight = creature.gameWorld.height * Main.CREATURE_SIZE;
+            float worldWidth = creature.gameWorld.width;
+            float worldHeight = creature.gameWorld.height;
             float x = creature.position.x;
             float y = creature.position.y;
-            float halfSize = creature.getSize() * Main.CREATURE_SIZE / 2;
+            float halfSize = creature.getSize() / 2;
             float dx = x > worldWidth / 2 ? worldWidth - x - halfSize : halfSize - x;
             float dy = y > worldHeight / 2 ? worldHeight - y - halfSize : halfSize - y;
             if (Math.abs(dx) > Math.abs(dy)) {

@@ -1,4 +1,4 @@
-package com.gordonfromblumberg.games.core.common.model;
+package com.gordonfromblumberg.games.core.common.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -14,6 +14,8 @@ import com.gordonfromblumberg.games.core.common.event.Event;
 import com.gordonfromblumberg.games.core.common.event.EventHandler;
 import com.gordonfromblumberg.games.core.common.event.EventProcessor;
 import com.gordonfromblumberg.games.core.common.event.SimpleEvent;
+import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
+import com.gordonfromblumberg.games.core.common.model.GameObject;
 import com.gordonfromblumberg.games.core.common.utils.RandomUtils;
 import com.gordonfromblumberg.games.core.evo.world.SpawnPoint;
 import com.gordonfromblumberg.games.core.evo.world.WorldParams;
@@ -28,87 +30,31 @@ import java.util.Iterator;
 import static com.gordonfromblumberg.games.core.common.utils.RandomUtils.*;
 
 public class GameWorld implements Disposable {
+    private static int nextId = 1;
 
     public final WorldParams params = new WorldParams();
-    private final Array<EvoGameObject> gameObjects = new Array<>();
-    public Creature herb, herb2;
-    public Creature pred;
+    final Array<EvoGameObject> gameObjects = new Array<>();
 
     private final EventProcessor eventProcessor = new EventProcessor();
 
     int generation;
     int generationsToSimulate;
-    // world size of viewport
-    float screenWidth, screenHeight;
     public int width, height;
 
     final Array<SpawnPoint> spawnPoints = new Array<>(30 * 4);
     int spawnPointCount;
 
-    private boolean paused, started, stopRequested;
-
-    private final Color pauseColor = Color.GRAY;
-
-    private NinePatch background;
+    boolean paused, started, stopRequested;
 
     int maxGameObjectCount = 0;
     private float time = 0;
 
-    public GameWorld() {
-        final AssetManager assets = Main.getInstance().assets();
+    public enum Direction { BOTTOM, RIGHT, TOP, LEFT }
 
-        background = new NinePatch(
-                assets.get("image/texture_pack.atlas", TextureAtlas.class)
-                        .findRegion("world-background"),
-                1, 1, 1, 1
-        );
-    }
-
-    public void initialize(int width, int height, float screenWidth, float screenHeight) {
+    public void initialize(int width, int height) {
         params.setDefault();
-        final float baseSize = Main.CREATURE_SIZE;
 
-        this.screenWidth = screenWidth;
-        this.screenHeight = screenHeight;
         setSize(width, height);
-
-        herb = Creature.getInstance();
-        herb.setRegion("herbivorous");
-        herb.setPosition(baseSize / 2, baseSize / 2);
-        herb.setSize(baseSize, baseSize);
-        herb.setMaxVelocityForward(baseSize * 5);
-        herb.setMaxVelocityBackward(baseSize * 2);
-        herb.setMaxAngleVelocity(180);
-        herb.setMaxRotation(250);
-        herb.setMaxAcceleration(baseSize * 5f);
-        herb.setMaxDeceleration(baseSize * 5.5f);
-        herb.init();
-        addGameObject(herb);
-
-        herb2 = Creature.getInstance();
-        herb2.setRegion("herbivorous");
-        herb2.setPosition(width * Main.CREATURE_SIZE - baseSize / 2, height * Main.CREATURE_SIZE - baseSize / 2);
-        herb2.setSize(baseSize, baseSize);
-        herb2.setMaxVelocityForward(baseSize * 5);
-        herb2.setMaxVelocityBackward(baseSize * 2);
-        herb2.setMaxAngleVelocity(180);
-        herb2.setMaxRotation(250);
-        herb2.setMaxAcceleration(baseSize * 5f);
-        herb2.setMaxDeceleration(baseSize * 5.5f);
-        herb2.init();
-        addGameObject(herb2);
-
-        pred = Creature.getInstance();
-        pred.setRegion("predator");
-        pred.setPosition(width * Main.CREATURE_SIZE - baseSize / 2, baseSize / 2);
-        pred.setSize(baseSize, baseSize);
-        pred.setMaxVelocityForward(baseSize * 5.5f);
-        pred.setMaxVelocityBackward(baseSize * 2);
-        pred.setMaxAngleVelocity(110);
-        pred.setMaxRotation(180);
-        pred.setMaxAcceleration(baseSize * 5);
-        pred.setMaxDeceleration(baseSize * 6.5f);
-//        addCreature(pred);
     }
 
     public void newGeneration() {
@@ -130,17 +76,15 @@ public class GameWorld implements Disposable {
             EvoGameObject go = goIt.next();
             if (go instanceof Food) {
                 Food food = (Food) go;
-                food.setGameWorld(null);
-                food.active = false;
                 food.release();
                 goIt.remove();
             }
         }
 
-        final float fromX = getSpawnPointWidth() + Main.CREATURE_SIZE / 2;
-        final float toX = screenWidth - fromX;
-        final float fromY = getSpawnPointHeight() + Main.CREATURE_SIZE / 2;
-        final float toY = screenHeight - fromY;
+        final float fromX = (float) width / (width / 2) + 0.5f;
+        final float toX = width - fromX;
+        final float fromY = (float) height / (height / 2) + 0.5f;
+        final float toY = height - fromY;
 
         final int foodCount = nextInt(params.getFoodCountFrom(), params.getFoodCountTo());
         for (int i = 0; i < foodCount; i++) {
@@ -148,13 +92,18 @@ public class GameWorld implements Disposable {
             food.setValue(nextFloat(params.getFoodValueFrom(), params.getFoodValueTo()));
             food.setPosition(nextFloat(fromX, toX), nextFloat(fromY, toY));
             food.setRegion("food");
-            food.setSize(Main.CREATURE_SIZE * 0.5f, Main.CREATURE_SIZE * 0.5f);
+            float size = (float) Math.sqrt(food.getValue() / 40);
+            food.setSize(size, size);
             addGameObject(food);
         }
     }
 
     void createFirstGeneration() {
-
+        for (int i = 0, count = params.getCreaturesCount(); i < count; i++) {
+            Creature creature = Creature.getInstance();
+            creature.init();
+            addGameObject(creature);
+        }
     }
 
     void produceOffspring() {
@@ -215,8 +164,8 @@ public class GameWorld implements Disposable {
     }
 
     void setupSpawnPoints() {
-        final float pointWidth = getSpawnPointWidth(), pointHeight = getSpawnPointHeight();
         final int countX = width / 2 - 2, countY = height / 2 - 2;
+        final float pointWidth = (float) width / (countX + 2), pointHeight = (float) height / (countY + 2);
         final int count = (countX + countY) * 2;
         this.spawnPointCount = count;
 
@@ -235,12 +184,16 @@ public class GameWorld implements Disposable {
 
             if (i < countX) {
                 sp.setSpawnArea((1 + i) * pointWidth, 0, pointWidth, pointHeight);
+                sp.setDir(Direction.BOTTOM);
             } else if (i < countX + countY) {
-                sp.setSpawnArea(countX * pointWidth, (1 + i - countX) * pointHeight, pointWidth, pointHeight);
+                sp.setSpawnArea((countX + 1) * pointWidth, (1 + i - countX) * pointHeight, pointWidth, pointHeight);
+                sp.setDir(Direction.RIGHT);
             } else if (i < 2 * countX + countY) {
-                sp.setSpawnArea((1 + countX + countY - i) * pointWidth, countY * pointHeight, pointWidth, pointHeight);
+                sp.setSpawnArea((2 * countX + countY - i) * pointWidth, (countY + 1) * pointHeight, pointWidth, pointHeight);
+                sp.setDir(Direction.TOP);
             } else {
-                sp.setSpawnArea(0, (1 + 2 * countX + countY - i) * pointHeight, pointWidth, pointHeight);
+                sp.setSpawnArea(0, (2 * countX + 2 * countY - i) * pointHeight, pointWidth, pointHeight);
+                sp.setDir(Direction.LEFT);
             }
         }
     }
@@ -255,16 +208,14 @@ public class GameWorld implements Disposable {
     public void addGameObject(EvoGameObject gameObject) {
         gameObjects.add(gameObject);
         gameObject.setGameWorld(this);
-        gameObject.active = true;
-        gameObject.id = GameObject.nextId++;
+        gameObject.setActive(true);
+        gameObject.setId(nextId++);
 
         if (gameObjects.size > maxGameObjectCount) maxGameObjectCount = gameObjects.size;
     }
 
     public void removeGameObject(EvoGameObject gameObject) {
         gameObjects.removeValue(gameObject, true);
-        gameObject.setGameWorld(null);
-        gameObject.active = false;
         gameObject.release();
     }
 
@@ -276,72 +227,17 @@ public class GameWorld implements Disposable {
                 go.update(delta);
             }
 
-            pred.setTarget(herb.position.x, herb.position.y);
-
             if (time > 2) {
                 time = 0;
                 Gdx.app.log("GameWorld", "Game objects: current count = " + gameObjects.size + ", max count = " + maxGameObjectCount);
-                Gdx.app.log("Max velocity", "Herb = " + ((CreatureMovingStrategy) herb.movingStrategy).maxVelMag + ", pred = " + ((CreatureMovingStrategy) pred.movingStrategy).maxVelMag);
-                Gdx.app.log("Max acceleration", "Herb = " + ((CreatureMovingStrategy) herb.movingStrategy).maxAccMag + ", pred = " + ((CreatureMovingStrategy) pred.movingStrategy).maxAccMag);
             }
         }
 
         eventProcessor.process();
     }
 
-    public void render(Batch batch) {
-        final Color origColor = batch.getColor();
-        if (paused)
-            batch.setColor(pauseColor);
-
-        background.draw(batch, 0, 0, 0, 0,
-                Main.CREATURE_SIZE * screenWidth, Main.CREATURE_SIZE * screenHeight,
-                1f / Main.CREATURE_SIZE, 1f / Main.CREATURE_SIZE, 0);
-
-        if (paused) {
-            for (EvoGameObject go : gameObjects) {
-                go.sprite.setColor(pauseColor);
-                go.render(batch);
-                go.sprite.setColor(Color.WHITE);
-            }
-        } else {
-            for (EvoGameObject go : gameObjects) {
-                go.render(batch);
-            }
-        }
-
-        if (paused) {
-//            pauseText.draw(batch);
-            batch.setColor(origColor);
-        }
-    }
-
     public Array<EvoGameObject> getGameObjects() {
         return gameObjects;
-    }
-
-    //    public float getMinVisibleX() {
-//        return visibleArea.x;
-//    }
-//
-//    public float getMaxVisibleX() {
-//        return visibleArea.x + visibleArea.width;
-//    }
-//
-//    public float getMinVisibleY() {
-//        return visibleArea.y;
-//    }
-//
-//    public float getMaxVisibleY() {
-//        return visibleArea.y + visibleArea.height;
-//    }
-
-    private float getSpawnPointWidth() {
-        return screenWidth / (2 * width);
-    }
-
-    private float getSpawnPointHeight() {
-        return screenHeight / (2 * height);
     }
 
     public boolean pause() {

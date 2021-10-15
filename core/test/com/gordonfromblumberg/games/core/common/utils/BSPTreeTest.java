@@ -197,9 +197,6 @@ public class BSPTreeTest {
     }
 
     private static class TestObject extends GameObject {
-        void setId(int id) {
-            this.id = id;
-        }
     }
 
     private static IterationCountBuilder builder() {

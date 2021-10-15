@@ -23,11 +23,11 @@ public class ParallaxBackground {
         }
     }
 
-    public void render(Batch batch) {
-        for (Layer layer : layers)
-            for (GameObject object : layer.gameObjects)
-                object.render(batch);
-    }
+//    public void render(Batch batch) {
+//        for (Layer layer : layers)
+//            for (GameObject object : layer.gameObjects)
+//                object.render(batch);
+//    }
 
     private static class Layer {
         private final float coefficient;

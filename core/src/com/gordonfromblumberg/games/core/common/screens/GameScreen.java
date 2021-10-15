@@ -14,17 +14,19 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
-import com.gordonfromblumberg.games.core.common.model.GameWorld;
+import com.gordonfromblumberg.games.core.common.world.GameWorld;
 import com.gordonfromblumberg.games.core.common.ui.ButtonConfig;
 import com.gordonfromblumberg.games.core.common.ui.FloatField;
 import com.gordonfromblumberg.games.core.common.ui.IntField;
 import com.gordonfromblumberg.games.core.common.utils.ConfigManager;
 import com.gordonfromblumberg.games.core.common.ui.UIUtils;
+import com.gordonfromblumberg.games.core.common.world.GameWorldRenderer;
 import com.gordonfromblumberg.games.core.evo.event.NewGenerationEvent;
 
 public class GameScreen extends AbstractScreen {
     TextureRegion background;
     private final GameWorld gameWorld;
+    private final GameWorldRenderer renderer;
 
     private final Color pauseColor = Color.LIGHT_GRAY;
 
@@ -33,6 +35,7 @@ public class GameScreen extends AbstractScreen {
 
         color = Color.GRAY;
         gameWorld = new GameWorld();
+        renderer = new GameWorldRenderer(gameWorld);
     }
 
     @Override
@@ -44,23 +47,23 @@ public class GameScreen extends AbstractScreen {
                 .findRegion("background");
 
         final ConfigManager configManager = AbstractFactory.getInstance().configManager();
-        gameWorld.initialize(configManager.getInteger("game.world.width"), configManager.getInteger("game.world.height"),
-                viewport.getWorldHeight(), viewport.getWorldHeight());
+        gameWorld.initialize(configManager.getInteger("game.world.width"), configManager.getInteger("game.world.height"));
+        renderer.initialize(viewport, viewport.getWorldHeight(), viewport.getWorldHeight());
         gameWorld.newGeneration();
     }
 
     @Override
     protected void createWorldViewport() {
         final ConfigManager configManager = AbstractFactory.getInstance().configManager();
-        Main.CREATURE_SIZE = configManager.getFloat("game.creature.size");
-        final float worldWidth = configManager.getInteger("game.world.width") * Main.CREATURE_SIZE;
+        final float creatureSize = configManager.getFloat("game.creature.size");
+        final float worldHeight = configManager.getInteger("game.world.height") * creatureSize;
         final float minRatio = configManager.getFloat("minRatio");
         final float maxRatio = configManager.getFloat("maxRatio");
-        final float minWorldHeight = worldWidth / maxRatio;
-        final float maxWorldHeight = worldWidth / minRatio;
+        final float minWorldWidth = worldHeight * minRatio;
+        final float maxWorldWidth = worldHeight * maxRatio;
         camera = new OrthographicCamera();
         camera.setToOrtho(false);
-        viewport = new ExtendViewport(worldWidth, minWorldHeight, worldWidth, maxWorldHeight, camera);
+        viewport = new ExtendViewport(minWorldWidth, worldHeight, maxWorldWidth, worldHeight, camera);
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
 
@@ -78,7 +81,7 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     protected void renderWorld(float delta) {
-        gameWorld.render(batch);
+        renderer.render(batch);
     }
 
     @Override

@@ -22,6 +22,12 @@ public class Creature extends EvoGameObject {
     };
     private static final float BASE_SATIETY = AbstractFactory.getInstance().configManager().getFloat("game.creature.satiety");
     private static final float BASE_SENSE_RADIUS = AbstractFactory.getInstance().configManager().getFloat("game.creature.sense");
+    private static final float BASE_FORWARD_VELOCITY = 5;
+    private static final float BASE_BACKWARD_VELOCITY = 2;
+    private static final float BASE_ANGLE_VELOCITY = 180;
+    private static final float BASE_MAX_ROTATION = 250;
+    private static final float BASE_ACCELERATION = 5;
+    private static final float BASE_DECELERATION = 6;
 
     private final DNA dna = new DNA();
     private final IntMap[] stateParams = new IntMap[State.values().length];
@@ -31,7 +37,7 @@ public class Creature extends EvoGameObject {
     private boolean isPredator;
     private EvoGameObject target;
     private float senseRadius;
-    private float forceMultiplier;
+    private float acceleration, forceMultiplier = 1.0f;
     private float size;
     private float requiredSatiety, offspringSatiety, satiety;
     private int offspringCount;
@@ -46,12 +52,26 @@ public class Creature extends EvoGameObject {
 
     public void init() {
         isPredator = dna.getFoodType() == DNA.FoodType.PREDATOR;
+        setRegion(isPredator ? "predator" : "herbivorous");
         size = 1 + 0.1f * dna.getSize();
+        setSize(size, size);
         senseRadius = (1 + 0.1f * dna.getSense()) * BASE_SENSE_RADIUS;
         requiredSatiety = calcRequiredSatiety();
         offspringSatiety = calcOffspringSatiety();
         offspringCount = 1;
         satiety = 0;
+
+        float velocityCoef = 1 + 0.1f * dna.getVelocity();
+        CreatureMovingStrategy ms = (CreatureMovingStrategy) movingStrategy;
+        ms.setMaxVelocityForward(velocityCoef * size * BASE_FORWARD_VELOCITY);
+        ms.setMaxVelocityBackward(velocityCoef * size * BASE_BACKWARD_VELOCITY);
+
+        ms.setMaxAngleVelocity((1 + 0.05f * dna.getSize()) * BASE_ANGLE_VELOCITY);
+        ms.setMaxRotation((1 + 0.05f * dna.getSize()) * BASE_MAX_ROTATION);
+
+        acceleration = (1 - 0.1f * dna.getSize()) * BASE_ACCELERATION;
+        ms.setMaxAcceleration(acceleration);
+        ms.setMaxDeceleration((1 - 0.1f * dna.getSize()) * BASE_DECELERATION);
     }
 
     @Override
@@ -109,8 +129,8 @@ public class Creature extends EvoGameObject {
             if (velocity.x < 0)
                 velocity.x = 0;
         }
-        if (position.x > gameWorld.width * Main.CREATURE_SIZE - halfSize) {
-            position.x = gameWorld.width * Main.CREATURE_SIZE - halfSize;
+        if (position.x > gameWorld.width - halfSize) {
+            position.x = gameWorld.width - halfSize;
             if (velocity.x > 0)
                 velocity.x = 0;
         }
@@ -119,8 +139,8 @@ public class Creature extends EvoGameObject {
             if (velocity.y < 0)
                 velocity.y = 0;
         }
-        if (position.y > gameWorld.height * Main.CREATURE_SIZE - halfSize) {
-            position.y = gameWorld.height * Main.CREATURE_SIZE - halfSize;
+        if (position.y > gameWorld.height - halfSize) {
+            position.y = gameWorld.height - halfSize;
             if (velocity.y > 0)
                 velocity.y = 0;
         }
@@ -206,12 +226,9 @@ public class Creature extends EvoGameObject {
         return isPredator;
     }
 
-    public float getForceMultiplier() {
-        return forceMultiplier;
-    }
-
     public void setForceMultiplier(float forceMultiplier) {
         this.forceMultiplier = forceMultiplier;
+        ((CreatureMovingStrategy) movingStrategy).setMaxAcceleration(forceMultiplier * acceleration);
     }
 
     @Override

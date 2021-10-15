@@ -1,6 +1,6 @@
 package com.gordonfromblumberg.games.core.common.ui;
 
-import com.gordonfromblumberg.games.core.common.model.GameWorld;
+import com.gordonfromblumberg.games.core.common.world.GameWorld;
 
 public class ButtonConfig {
     final GameWorld gameWorld;
