@@ -11,6 +11,9 @@ import com.gordonfromblumberg.games.core.evo.food.Food;
 import com.gordonfromblumberg.games.core.evo.model.EvoGameObject;
 import com.gordonfromblumberg.games.core.evo.physics.CreatureMovingStrategy;
 import com.gordonfromblumberg.games.core.evo.state.State;
+import com.gordonfromblumberg.games.core.evo.world.SpawnPoint;
+
+import java.util.Iterator;
 
 public class Creature extends EvoGameObject {
 
@@ -37,10 +40,11 @@ public class Creature extends EvoGameObject {
     private boolean isPredator;
     private EvoGameObject target;
     private float senseRadius;
-    private float acceleration, forceMultiplier = 1.0f;
+    private float acceleration;
     private float size;
     private float requiredSatiety, offspringSatiety, satiety;
     private int offspringCount;
+    private SpawnPoint spawnPoint;
 
     private Creature() {
         movingStrategy = new CreatureMovingStrategy();
@@ -95,6 +99,14 @@ public class Creature extends EvoGameObject {
         if (foodObject instanceof Food) {
             Food food = (Food) foodObject;
             satiety += food.getValue();
+
+            Iterator<Creature> chaserIt = food.getChasers().iterator();
+            while(chaserIt.hasNext()) {
+                Creature chaser = chaserIt.next();
+                chaserIt.remove();
+                chaser.setTarget(null);
+            }
+
             gameWorld.removeGameObject(food);
         }
     }
@@ -111,10 +123,11 @@ public class Creature extends EvoGameObject {
     public void produceOffspring() {
         for (int i = 0; i < offspringCount; i++) {
             Creature child = pool.obtain();
-            dna.copy(child.dna);
+            this.dna.copy(child.dna);
             child.dna.mutate();
             child.init();
             child.parent = this;
+            child.spawnPoint = this.spawnPoint;
             gameWorld.addGameObject(child);
         }
     }
@@ -146,36 +159,12 @@ public class Creature extends EvoGameObject {
         }
     }
 
-    public void setMaxVelocityForward(float value) {
-        ((CreatureMovingStrategy) movingStrategy).setMaxVelocityForward(value);
-    }
-
-    public void setMaxVelocityBackward(float value) {
-        ((CreatureMovingStrategy) movingStrategy).setMaxVelocityBackward(value);
-    }
-
-    public void setMaxAngleVelocity(float value) {
-        ((CreatureMovingStrategy) movingStrategy).setMaxAngleVelocity(value);
-    }
-
-    public void setMaxRotation(float value) {
-        ((CreatureMovingStrategy) movingStrategy).setMaxRotation(value);
-    }
-
-    public void setMaxAcceleration(float value) {
-        ((CreatureMovingStrategy) movingStrategy).setMaxAcceleration(value);
-    }
-
-    public void setMaxDeceleration(float value) {
-        ((CreatureMovingStrategy) movingStrategy).setMaxDeceleration(value);
-    }
-
-    public void setDecelerationDist(float value) {
-        ((CreatureMovingStrategy) movingStrategy).setDecelerationDistance(value);
-    }
-
     public void setDecelerate(boolean decelerate) {
         ((CreatureMovingStrategy) movingStrategy).setDecelerate(decelerate);
+    }
+
+    public boolean isTargetReached() {
+        return ((CreatureMovingStrategy) movingStrategy).isTargetReached();
     }
 
     public void setState(State state) {
@@ -227,7 +216,6 @@ public class Creature extends EvoGameObject {
     }
 
     public void setForceMultiplier(float forceMultiplier) {
-        this.forceMultiplier = forceMultiplier;
         ((CreatureMovingStrategy) movingStrategy).setMaxAcceleration(forceMultiplier * acceleration);
     }
 
@@ -256,5 +244,14 @@ public class Creature extends EvoGameObject {
     public void reset() {
         super.reset();
         parent = null;
+        spawnPoint = null;
+    }
+
+    public SpawnPoint getSpawnPoint() {
+        return spawnPoint;
+    }
+
+    public void setSpawnPoint(SpawnPoint spawnPoint) {
+        this.spawnPoint = spawnPoint;
     }
 }

@@ -4,17 +4,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
-import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.utils.RandomUtils;
 import com.gordonfromblumberg.games.core.evo.creature.Creature;
-import com.gordonfromblumberg.games.core.evo.food.Food;
+import com.gordonfromblumberg.games.core.evo.event.HomeReachedEvent;
 import com.gordonfromblumberg.games.core.evo.model.EvoGameObject;
+import com.gordonfromblumberg.games.core.evo.world.SpawnPoint;
 
 public enum State {
     WAITING {
         @Override
         public void enter(Creature creature) {
             creature.getStateParams(this).put(0, RandomUtils.nextFloat(0.4f));
+            creature.setSpawnPoint(null);
         }
 
         @Override
@@ -94,6 +95,12 @@ public enum State {
             } else {
                 // TODO: check food has not been eaten
                 EvoGameObject target = (EvoGameObject) creature.getTarget();
+
+                if (target == null) {
+                    creature.setState(FOOD_SEARCHING);
+                    return;
+                }
+
                 float dist = (creature.getSize() + target.getSize()) * 0.5f * 0.8f;
 //                Gdx.app.log("MOVEMENT_TO_FOOD", "Creature size = " + creature.getSize() + ", target = " + target.getSize() + ", dist = " + dist);
                 if (target.position.dst2(creature.position) <= dist * dist) {
@@ -111,18 +118,24 @@ public enum State {
     MOVEMENT_TO_HOME {
         @Override
         public void enter(Creature creature) {
-            float worldWidth = creature.gameWorld.width;
-            float worldHeight = creature.gameWorld.height;
-            float x = creature.position.x;
-            float y = creature.position.y;
-            float halfSize = creature.getSize() / 2;
-            float dx = x > worldWidth / 2 ? worldWidth - x - halfSize : halfSize - x;
-            float dy = y > worldHeight / 2 ? worldHeight - y - halfSize : halfSize - y;
-            if (Math.abs(dx) > Math.abs(dy)) {
-                creature.setTarget(x, y + dy);
-            } else {
-                creature.setTarget(x + dx, y);
+
+            SpawnPoint closest = null;
+            float closestDist = Float.MAX_VALUE;
+            int index = -1;
+
+            final Array<SpawnPoint> spawnPoints = creature.gameWorld.getSpawnPoints();
+            for (int i = 0, count = creature.gameWorld.getSpawnPointCount(); i < count; i++) {
+                SpawnPoint sp = spawnPoints.get(i);
+                float dist = creature.position.dst2(sp.getX(), sp.getY());
+                if (closest == null || dist < closestDist) {
+                    closest = sp;
+                    closestDist = dist;
+                    index = i;
+                }
             }
+
+            creature.getStateParams(this).put(0, index);
+            creature.setTarget(closest.getX(), closest.getY());
             creature.setForceMultiplier(0.7f);
             creature.setDecelerate(true);
         }
@@ -130,6 +143,18 @@ public enum State {
         @Override
         public void update(Creature creature, float dt) {
             // TODO check for predators
+
+            if (creature.isTargetReached()) {
+                creature.gameWorld.pushEvent(HomeReachedEvent.of(creature));
+                creature.setSpawnPoint(creature.gameWorld.getSpawnPoints().get((int) creature.getStateParams(this).get(0)));
+                creature.setState(HOME);
+            }
+        }
+    },
+
+    HOME {
+        @Override
+        public void update(Creature creature, float dt) {
         }
     };
 

@@ -49,7 +49,7 @@ public class GameScreen extends AbstractScreen {
         final ConfigManager configManager = AbstractFactory.getInstance().configManager();
         gameWorld.initialize(configManager.getInteger("game.world.width"), configManager.getInteger("game.world.height"));
         renderer.initialize(viewport, viewport.getWorldHeight(), viewport.getWorldHeight());
-        gameWorld.newGeneration();
+//        gameWorld.newGeneration();
     }
 
     @Override

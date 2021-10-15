@@ -98,6 +98,10 @@ public class ToTargetMovingStrategy extends AccelerationMovingStrategy {
         return decelerationDistance;
     }
 
+    public boolean isTargetReached() {
+        return targetReached;
+    }
+
     protected float calcDecelerationDist() {
         return maxVelocity2 / (2 * maxDeceleration);
     }
