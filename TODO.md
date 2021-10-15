@@ -1,10 +1,10 @@
 # Evo
 ## TODO list
 
-- \- Spawn points (consider creatures count may be greater than count of spawn points)
+- \+ Spawn points (consider creatures count may be greater than count of spawn points)
 - \+ Pause in simulation
 - \+ UI for start / stop simulation, setting for count of creatures
 - \- Statistic (count of creatures, survived ones, max / min average size / velocity / sense)
 - \- Save / load generation and settings
 - \- EATING state
-- \- Scrolling and zoom
+- \+ Separate world and viewport coords
