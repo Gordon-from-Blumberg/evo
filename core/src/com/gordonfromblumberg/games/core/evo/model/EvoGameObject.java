@@ -6,6 +6,7 @@ import com.gordonfromblumberg.games.core.evo.creature.Creature;
 
 public abstract class EvoGameObject extends PhysicsGameObject {
     private final Array<Creature> chasers = new Array<>();
+    protected float size;
 
     public void addChaser(Creature creature) {
         chasers.add(creature);
@@ -19,5 +20,13 @@ public abstract class EvoGameObject extends PhysicsGameObject {
         return chasers;
     }
 
-    public abstract float getSize();
+    public float getSize() {
+        return size;
+    }
+
+    @Override
+    public void setSize(float width, float height) {
+        super.setSize(width, height);
+        size = width;
+    }
 }

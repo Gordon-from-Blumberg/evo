@@ -31,11 +31,6 @@ public class Food extends EvoGameObject {
     }
 
     @Override
-    public float getSize() {
-        return 0.05f * value;
-    }
-
-    @Override
     public void release() {
         pool.free(this);
     }

@@ -142,6 +142,9 @@ public class GameWorld implements Disposable {
         Gdx.app.log("Spawn", "Creatures count = " + creatureCount
                 + ", spawnPointCount = " + spawnPointCount + ", max count per spawn point = " + maxCount);
 
+        for (SpawnPoint sp : spawnPoints)
+            sp.clear();
+
         for (EvoGameObject go : gameObjects) {
             if (go instanceof Creature) {
                 Creature creature = (Creature) go;
@@ -171,6 +174,8 @@ public class GameWorld implements Disposable {
                         }
                     }
                 }
+
+                creature.resetSatiety();
             }
         }
     }

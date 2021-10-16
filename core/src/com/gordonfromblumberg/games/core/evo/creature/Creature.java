@@ -41,7 +41,6 @@ public class Creature extends EvoGameObject {
     private EvoGameObject target;
     private float senseRadius;
     private float acceleration;
-    private float size;
     private float requiredSatiety, offspringSatiety, satiety;
     private int offspringCount;
     private SpawnPoint spawnPoint;
@@ -57,9 +56,9 @@ public class Creature extends EvoGameObject {
     public void init() {
         isPredator = dna.getFoodType() == DNA.FoodType.PREDATOR;
         setRegion(isPredator ? "predator" : "herbivorous");
-        size = 1 + 0.1f * dna.getSize();
+        float size = 1 + 0.1f * dna.getSize();
         setSize(size, size);
-        senseRadius = (1 + 0.1f * dna.getSense()) * BASE_SENSE_RADIUS;
+        senseRadius = (1 + 0.1f * dna.getSense()) * BASE_SENSE_RADIUS * size;
         requiredSatiety = calcRequiredSatiety();
         offspringSatiety = calcOffspringSatiety();
         offspringCount = 1;
@@ -219,11 +218,6 @@ public class Creature extends EvoGameObject {
         ((CreatureMovingStrategy) movingStrategy).setMaxAcceleration(forceMultiplier * acceleration);
     }
 
-    @Override
-    public float getSize() {
-        return size;
-    }
-
     public float getRequiredSatiety() {
         return requiredSatiety;
     }
@@ -236,6 +230,10 @@ public class Creature extends EvoGameObject {
         return satiety;
     }
 
+    public void resetSatiety() {
+        satiety = 0;
+    }
+
     public void release() {
         pool.free(this);
     }
@@ -245,6 +243,7 @@ public class Creature extends EvoGameObject {
         super.reset();
         parent = null;
         spawnPoint = null;
+        satiety = 0;
     }
 
     public SpawnPoint getSpawnPoint() {

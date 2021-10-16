@@ -66,7 +66,8 @@ public enum State {
             for (int i = 0, size = foods.size; i < size; i++) {
                 EvoGameObject food = foods.get(i);
                 if (creature != food && creature.isEatable(food)) {
-                    float dist2 = position.dst2(food.position);
+                    float div = 2 * food.getSize();
+                    float dist2 = position.dst2(food.position) / div;
                     if (dist2 < minDist2) {
                         minDist2 = dist2;
                         target = food;
