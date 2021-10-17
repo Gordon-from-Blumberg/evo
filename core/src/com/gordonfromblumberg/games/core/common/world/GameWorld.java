@@ -36,13 +36,14 @@ public class GameWorld implements Disposable {
 
     public final WorldParams params = new WorldParams();
     final Array<EvoGameObject> gameObjects = new Array<>();
-    private int creatureCount, foodCount, homeReachedCount;
 
     private final EventProcessor eventProcessor = new EventProcessor();
 
+    public int width, height;
+
+    private int creatureCount, foodCount, homeReachedCount, birthedCount;
     int generation;
     int generationsToSimulate;
-    public int width, height;
 
     final Array<SpawnPoint> spawnPoints = new Array<>(30 * 4);
     int spawnPointCount;
@@ -75,7 +76,6 @@ public class GameWorld implements Disposable {
 
     public void newGeneration() {
         generation++;
-        foodCount = 0;
         homeReachedCount = 0;
 
         generateFood();
@@ -86,6 +86,8 @@ public class GameWorld implements Disposable {
         placeCreatures();
         NewGenerationEvent event = NewGenerationEvent.getInstance();
         event.setGenerationNumber(generation);
+        event.setCreatureCount(creatureCount);
+        event.setFoodCount(foodCount);
         eventProcessor.push(event);
         generated = true;
     }
@@ -116,13 +118,17 @@ public class GameWorld implements Disposable {
             food.setSize(size, size);
             addGameObject(food);
         }
+
+        this.foodCount = foodCount;
     }
 
     void createFirstGeneration() {
+        creatureCount = 0;
         for (int i = 0, count = params.getCreaturesCount(); i < count; i++) {
             Creature creature = Creature.getInstance();
             creature.init();
             addGameObject(creature);
+            creatureCount++;
         }
     }
 
@@ -282,20 +288,17 @@ public class GameWorld implements Disposable {
 
         if (gameObjects.size > maxGameObjectCount)
             maxGameObjectCount = gameObjects.size;
+    }
 
-        if (gameObject instanceof Creature)
-            creatureCount++;
-        else if (gameObject instanceof Food)
-            foodCount++;
+    public void increaseCreatureCount() {
+        creatureCount++;
     }
 
     public void removeGameObject(EvoGameObject gameObject) {
         gameObjects.removeValue(gameObject, true);
         gameObject.release();
 
-        if (gameObject instanceof Creature) {
-            creatureCount--;
-        } else if (gameObject instanceof Food) {
+        if (gameObject instanceof Food) {
             foodCount--;
             // TODO when predators appear this condition become incorrect
             if (foodCount == 0 && started) {

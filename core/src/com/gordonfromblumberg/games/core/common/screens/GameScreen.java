@@ -121,12 +121,27 @@ public class GameScreen extends AbstractScreen {
             uiTable.debugAll();
         uiRootTable.add(uiTable);
 
-        Label label = new Label("", uiSkin);
+        Label generationLbl = new Label("", uiSkin);
+        uiTable.add(generationLbl).colspan(5);
+
+        // INFO
+        uiTable.row();
+        Label creaturesLbl = new Label("", uiSkin);
+        uiTable.add(new Label("Creatures", uiSkin)).colspan(2);
+        uiTable.add(creaturesLbl);
+
+        uiTable.row();
+        Label foodLbl = new Label("", uiSkin);
+        uiTable.add(new Label("Food", uiSkin)).colspan(2);
+        uiTable.add(foodLbl);
+
         gameWorld.registerHandler("NewGeneration", e -> {
-            label.setText("Generation #" + ((NewGenerationEvent) e).getGenerationNumber());
+            NewGenerationEvent event = (NewGenerationEvent) e;
+            generationLbl.setText("Generation #" + event.getGenerationNumber());
+            creaturesLbl.setText(String.valueOf(event.getCreatureCount()));
+            foodLbl.setText(String.valueOf(event.getFoodCount()));
             return false;
         });
-        uiTable.add(label).colspan(5);
 
         // FOOD
         uiTable.row().padTop(10);

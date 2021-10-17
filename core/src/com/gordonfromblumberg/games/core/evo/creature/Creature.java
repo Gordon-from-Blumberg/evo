@@ -128,6 +128,7 @@ public class Creature extends EvoGameObject {
             child.parent = this;
             child.spawnPoint = this.spawnPoint;
             gameWorld.addGameObject(child);
+            gameWorld.increaseCreatureCount();
         }
     }
 

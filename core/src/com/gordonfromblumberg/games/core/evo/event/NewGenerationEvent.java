@@ -12,7 +12,7 @@ public class NewGenerationEvent implements Event {
         }
     };
 
-    private int generationNumber;
+    private int generationNumber, creatureCount, foodCount;
 
     private NewGenerationEvent() {
     }
@@ -38,8 +38,26 @@ public class NewGenerationEvent implements Event {
         this.generationNumber = generationNumber;
     }
 
+    public int getCreatureCount() {
+        return creatureCount;
+    }
+
+    public void setCreatureCount(int creatureCount) {
+        this.creatureCount = creatureCount;
+    }
+
+    public int getFoodCount() {
+        return foodCount;
+    }
+
+    public void setFoodCount(int foodCount) {
+        this.foodCount = foodCount;
+    }
+
     @Override
     public void reset() {
         generationNumber = -1;
+        creatureCount = 0;
+        foodCount = 0;
     }
 }
