@@ -127,7 +127,7 @@ public class GameScreen extends AbstractScreen {
         // INFO
         uiTable.row();
         Label creaturesLbl = new Label("", uiSkin);
-        uiTable.add(new Label("Creatures", uiSkin)).colspan(2);
+        uiTable.add(new Label("Creatures\ntotal / birthed", uiSkin)).colspan(2);
         uiTable.add(creaturesLbl);
 
         uiTable.row();
@@ -138,7 +138,7 @@ public class GameScreen extends AbstractScreen {
         gameWorld.registerHandler("NewGeneration", e -> {
             NewGenerationEvent event = (NewGenerationEvent) e;
             generationLbl.setText("Generation #" + event.getGenerationNumber());
-            creaturesLbl.setText(String.valueOf(event.getCreatureCount()));
+            creaturesLbl.setText(event.getCreatureCount() + " / " + event.getBirthedCount());
             foodLbl.setText(String.valueOf(event.getFoodCount()));
             return false;
         });

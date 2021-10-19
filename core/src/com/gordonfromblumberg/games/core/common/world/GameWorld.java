@@ -87,6 +87,7 @@ public class GameWorld implements Disposable {
         NewGenerationEvent event = NewGenerationEvent.getInstance();
         event.setGenerationNumber(generation);
         event.setCreatureCount(creatureCount);
+        event.setBirthedCount(birthedCount);
         event.setFoodCount(foodCount);
         eventProcessor.push(event);
         generated = true;

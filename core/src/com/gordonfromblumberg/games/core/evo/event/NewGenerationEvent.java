@@ -12,7 +12,7 @@ public class NewGenerationEvent implements Event {
         }
     };
 
-    private int generationNumber, creatureCount, foodCount;
+    private int generationNumber, creatureCount, birthedCount, foodCount;
 
     private NewGenerationEvent() {
     }
@@ -44,6 +44,14 @@ public class NewGenerationEvent implements Event {
 
     public void setCreatureCount(int creatureCount) {
         this.creatureCount = creatureCount;
+    }
+
+    public int getBirthedCount() {
+        return birthedCount;
+    }
+
+    public void setBirthedCount(int birthedCount) {
+        this.birthedCount = birthedCount;
     }
 
     public int getFoodCount() {
