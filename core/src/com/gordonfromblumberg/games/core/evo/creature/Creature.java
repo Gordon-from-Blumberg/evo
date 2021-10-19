@@ -42,7 +42,7 @@ public class Creature extends EvoGameObject {
     private float senseRadius;
     private float acceleration;
     private float requiredSatiety, offspringSatiety, satiety;
-    private int offspringCount;
+    private int offspringCount, offspringProduced;
     private SpawnPoint spawnPoint;
 
     private Creature() {
@@ -62,6 +62,7 @@ public class Creature extends EvoGameObject {
         requiredSatiety = calcRequiredSatiety();
         offspringSatiety = calcOffspringSatiety();
         offspringCount = 1;
+        offspringProduced = 0;
         satiety = 0;
 
         float velocityCoef = 1 + 0.1f * dna.getVelocity();
@@ -120,7 +121,8 @@ public class Creature extends EvoGameObject {
     }
 
     public void produceOffspring() {
-        for (int i = 0; i < offspringCount; i++) {
+        int count = calcOffspringCount();
+        for (int i = 0; i < count; i++) {
             Creature child = pool.obtain();
             this.dna.copy(child.dna);
             child.dna.mutate();
@@ -128,8 +130,10 @@ public class Creature extends EvoGameObject {
             child.parent = this;
             child.spawnPoint = this.spawnPoint;
             gameWorld.addGameObject(child);
-            gameWorld.increaseCreatureCount();
         }
+
+        offspringProduced += count;
+        gameWorld.offspringProduced(count);
     }
 
     @Override
@@ -233,6 +237,10 @@ public class Creature extends EvoGameObject {
 
     public void resetSatiety() {
         satiety = 0;
+    }
+
+    private int calcOffspringCount() {
+        return offspringCount;
     }
 
     public void release() {

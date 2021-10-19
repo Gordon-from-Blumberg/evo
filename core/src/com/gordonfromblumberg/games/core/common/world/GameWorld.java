@@ -133,6 +133,7 @@ public class GameWorld implements Disposable {
     }
 
     void produceOffspring() {
+        birthedCount = 0;
         for (int i = 0, size = gameObjects.size; i < size; i++) {
             EvoGameObject ego;
             if ((ego = gameObjects.get(i)) instanceof Creature && ((Creature) ego).readyToReproduce()) {
@@ -290,8 +291,9 @@ public class GameWorld implements Disposable {
             maxGameObjectCount = gameObjects.size;
     }
 
-    public void increaseCreatureCount() {
-        creatureCount++;
+    public void offspringProduced(int count) {
+        creatureCount += count;
+        birthedCount += count;
     }
 
     public void removeGameObject(EvoGameObject gameObject) {
