@@ -8,3 +8,5 @@
 - \- Save / load generation and settings
 - \- EATING state
 - \+ Separate world and viewport coords
+- \- Avoiding borders and other creatures
+- \- New genes: fertility, offense, defense, eating speed
