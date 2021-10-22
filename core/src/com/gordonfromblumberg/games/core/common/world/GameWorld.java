@@ -127,8 +127,9 @@ public class GameWorld implements Disposable {
         creatureCount = 0;
         for (int i = 0, count = params.getCreaturesCount(); i < count; i++) {
             Creature creature = Creature.getInstance();
-            creature.init();
+            creature.init(1);
             addGameObject(creature);
+            Gdx.app.log("Creature", creature.getDescription());
             creatureCount++;
         }
     }
@@ -138,7 +139,7 @@ public class GameWorld implements Disposable {
         for (int i = 0, size = gameObjects.size; i < size; i++) {
             EvoGameObject ego;
             if ((ego = gameObjects.get(i)) instanceof Creature && ((Creature) ego).readyToReproduce()) {
-                ((Creature) ego).produceOffspring();
+                ((Creature) ego).produceOffspring(generation);
             }
         }
     }
@@ -225,7 +226,8 @@ public class GameWorld implements Disposable {
             if (go instanceof Creature) {
                 Creature creature = (Creature) go;
                 if (creature.getSatiety() < creature.getRequiredSatiety()) {
-                    Gdx.app.log("Creature", creature + " did not eat enough food, so did not survive");
+                    Gdx.app.log("Creature", creature + " - " + creature.getDnaDescription() + " did not eat enough food, "
+                            + "so did not survive after " + (generation - creature.getGeneration()) + " generations");
                     creature.release();
                     goIt.remove();
                     creatureCount--;

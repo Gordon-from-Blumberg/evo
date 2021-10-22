@@ -62,4 +62,9 @@ public class DNA {
             }
         }
     }
+
+    public String getDescription() {
+        return "Genes: SIZE=" + genes[Gene.SIZE.ordinal()] + ", VELOCITY=" + genes[Gene.VELOCITY.ordinal()]
+                + ", SENSE=" + genes[Gene.SENSE.ordinal()];
+    }
 }

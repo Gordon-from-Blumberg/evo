@@ -34,6 +34,7 @@ public class Creature extends EvoGameObject {
 
     private final DNA dna = new DNA();
     private final IntMap[] stateParams = new IntMap[State.values().length];
+    private int generation;
     private Creature parent;
 
     private State state;
@@ -53,7 +54,8 @@ public class Creature extends EvoGameObject {
         return pool.obtain();
     }
 
-    public void init() {
+    public void init(int generation) {
+        this.generation = generation;
         isPredator = dna.getFoodType() == DNA.FoodType.PREDATOR;
         setRegion(isPredator ? "predator" : "herbivorous");
         float size = 1 + 0.1f * dna.getSize();
@@ -120,16 +122,17 @@ public class Creature extends EvoGameObject {
         return satiety >= offspringSatiety;
     }
 
-    public void produceOffspring() {
+    public void produceOffspring(int generation) {
         int count = calcOffspringCount();
         for (int i = 0; i < count; i++) {
             Creature child = pool.obtain();
             this.dna.copy(child.dna);
             child.dna.mutate();
-            child.init();
+            child.init(generation);
             child.parent = this;
             child.spawnPoint = this.spawnPoint;
             gameWorld.addGameObject(child);
+            Gdx.app.log("Creature", child.getDescription());
         }
 
         offspringProduced += count;
@@ -211,16 +214,48 @@ public class Creature extends EvoGameObject {
         return requiredSatiety * 2;
     }
 
+    public void setForceMultiplier(float forceMultiplier) {
+        ((CreatureMovingStrategy) movingStrategy).setMaxAcceleration(forceMultiplier * acceleration);
+    }
+
+    public void resetSatiety() {
+        satiety = 0;
+    }
+
+    private int calcOffspringCount() {
+        return offspringCount;
+    }
+
+     public String getDescription() {
+         final CreatureMovingStrategy ms = (CreatureMovingStrategy) movingStrategy;
+         return toString() + " - " + dna.getDescription() + "; senseRadius = " + senseRadius
+                 + "; requiredSatiety = " + requiredSatiety + "; maxVelocity = " + ms.getMaxVelocityForward()
+                 + "; acceleration = " + acceleration;
+     }
+
+     public String getDnaDescription() {
+        return dna.getDescription();
+     }
+
+    public void release() {
+        pool.free(this);
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        generation = 0;
+        parent = null;
+        spawnPoint = null;
+        satiety = 0;
+    }
+
     public float getSenseRadius() {
         return senseRadius;
     }
 
     public boolean isPredator() {
         return isPredator;
-    }
-
-    public void setForceMultiplier(float forceMultiplier) {
-        ((CreatureMovingStrategy) movingStrategy).setMaxAcceleration(forceMultiplier * acceleration);
     }
 
     public float getRequiredSatiety() {
@@ -235,31 +270,15 @@ public class Creature extends EvoGameObject {
         return satiety;
     }
 
-    public void resetSatiety() {
-        satiety = 0;
-    }
-
-    private int calcOffspringCount() {
-        return offspringCount;
-    }
-
-    public void release() {
-        pool.free(this);
-    }
-
-    @Override
-    public void reset() {
-        super.reset();
-        parent = null;
-        spawnPoint = null;
-        satiety = 0;
-    }
-
     public SpawnPoint getSpawnPoint() {
         return spawnPoint;
     }
 
     public void setSpawnPoint(SpawnPoint spawnPoint) {
         this.spawnPoint = spawnPoint;
+    }
+
+    public int getGeneration() {
+        return generation;
     }
 }
