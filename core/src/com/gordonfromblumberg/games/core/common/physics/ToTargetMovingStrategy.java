@@ -5,6 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 
 public class ToTargetMovingStrategy extends AccelerationMovingStrategy {
     private static final float DEC_DIST_COEF = 1.05f;
+    // used as desired velocity magnitude when maxVelocity = 0
+    private static final float DEFAULT_DESIRED_VELOCITY = 10;
 
     protected final Vector2 target = new Vector2();
     protected final Vector2 desiredMovement = new Vector2();
@@ -114,10 +116,12 @@ public class ToTargetMovingStrategy extends AccelerationMovingStrategy {
 
 //        Gdx.app.log("Decel dist", "decel dist = " + decelerationDistance2 + ", desired movnt = " + desMovLen2);
         if (decelerate && desMovLen2 < decelerationDistance2) {
-            desiredVelocity.setLength2(maxVelocity2 * desMovLen2 / decelerationDistance2);
+            desiredVelocity.setLength2(maxVelocity2 > 0
+                    ? maxVelocity2 * desMovLen2 / decelerationDistance2
+                    : 2 * maxDeceleration * (float) Math.sqrt(desMovLen2));
 //            Gdx.app.log("", "desVelocity = " + desiredVelocity);
         } else {
-            desiredVelocity.setLength2(maxVelocity2);
+            desiredVelocity.setLength2(maxVelocity2 > 0 ? maxVelocity2 : DEFAULT_DESIRED_VELOCITY);
         }
     }
 }

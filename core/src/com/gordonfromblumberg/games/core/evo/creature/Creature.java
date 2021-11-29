@@ -23,14 +23,21 @@ public class Creature extends EvoGameObject {
             return new Creature();
         }
     };
+    private static final float BASE_SIZE = 1;
+    private static final float SIZE_MOD = 0.1f;
     private static final float BASE_SATIETY = AbstractFactory.getInstance().configManager().getFloat("game.creature.satiety");
     private static final float BASE_SENSE_RADIUS = AbstractFactory.getInstance().configManager().getFloat("game.creature.sense");
-    private static final float BASE_FORWARD_VELOCITY = 5;
+    private static final float SENSE_MOD = 0.1f;
+    private static final float VELOCITY_MOD = 0.1f;
     private static final float BASE_BACKWARD_VELOCITY = 2;
+    private static final float SIZE_VELOCITY_MOD = 0.05f;
     private static final float BASE_ANGLE_VELOCITY = 180;
+    private static final float ANGLE_VELOCITY_MOD = 0.05f;
     private static final float BASE_MAX_ROTATION = 250;
+    private static final float MAX_ROTATION_MOD = 0.05f;
     private static final float BASE_ACCELERATION = 5;
     private static final float BASE_DECELERATION = 6;
+    private static final float DECELERATION_DIST = 3;
 
     private final DNA dna = new DNA();
     private final IntMap[] stateParams = new IntMap[State.values().length];
@@ -58,26 +65,26 @@ public class Creature extends EvoGameObject {
         this.generation = generation;
         isPredator = dna.getFoodType() == DNA.FoodType.PREDATOR;
         setRegion(isPredator ? "predator" : "herbivorous");
-        float size = 1 + 0.1f * dna.getSize();
+        float size = (1 + SIZE_MOD * dna.getSize()) * BASE_SIZE;
         setSize(size, size);
-        senseRadius = (1 + 0.1f * dna.getSense()) * BASE_SENSE_RADIUS * size;
+        senseRadius = (1 + SENSE_MOD * dna.getSense()) * BASE_SENSE_RADIUS * size;
         requiredSatiety = calcRequiredSatiety();
         offspringSatiety = calcOffspringSatiety();
         offspringCount = 1;
         offspringProduced = 0;
         satiety = 0;
 
-        float velocityCoef = 1 + 0.1f * dna.getVelocity();
+        float velocityCoef = 1 + VELOCITY_MOD * dna.getVelocity();
         CreatureMovingStrategy ms = (CreatureMovingStrategy) movingStrategy;
-        ms.setMaxVelocityForward(velocityCoef * size * BASE_FORWARD_VELOCITY);
         ms.setMaxVelocityBackward(velocityCoef * size * BASE_BACKWARD_VELOCITY);
 
-        ms.setMaxAngleVelocity((1 + 0.05f * dna.getSize()) * BASE_ANGLE_VELOCITY);
-        ms.setMaxRotation((1 + 0.05f * dna.getSize()) * BASE_MAX_ROTATION);
+        ms.setMaxAngleVelocity((1 + ANGLE_VELOCITY_MOD * dna.getSize()) * BASE_ANGLE_VELOCITY);
+        ms.setMaxRotation((1 + MAX_ROTATION_MOD * dna.getSize()) * BASE_MAX_ROTATION);
 
-        acceleration = (1 - 0.1f * dna.getSize()) * BASE_ACCELERATION;
+        float accelerationCoef = velocityCoef * (1 + SIZE_VELOCITY_MOD * dna.getSize());
+        acceleration = accelerationCoef * BASE_ACCELERATION;
         ms.setMaxAcceleration(acceleration);
-        ms.setMaxDeceleration((1 - 0.1f * dna.getSize()) * BASE_DECELERATION);
+        ms.setMaxDeceleration(accelerationCoef * BASE_DECELERATION);
     }
 
     @Override
@@ -229,8 +236,7 @@ public class Creature extends EvoGameObject {
      public String getDescription() {
          final CreatureMovingStrategy ms = (CreatureMovingStrategy) movingStrategy;
          return toString() + " - " + dna.getDescription() + "; senseRadius = " + senseRadius
-                 + "; requiredSatiety = " + requiredSatiety + "; maxVelocity = " + ms.getMaxVelocityForward()
-                 + "; acceleration = " + acceleration;
+                 + "; requiredSatiety = " + requiredSatiety + "; acceleration = " + acceleration;
      }
 
      public String getDnaDescription() {

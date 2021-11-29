@@ -3,6 +3,7 @@ package com.gordonfromblumberg.games.core.evo.physics;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.physics.ToTargetMovingStrategy;
 import com.gordonfromblumberg.games.core.common.utils.MathHelper;
 
@@ -12,7 +13,7 @@ public class CreatureMovingStrategy extends ToTargetMovingStrategy {
     public float maxVelMag = 0;
     public float maxAccMag = 0;
 
-    private float maxVelocityForward, maxVelocityBackward;
+    private float maxVelocityBackward, maxVelocityBackward2;
     private float maxAngleVelocity, maxRotation;
 
     public CreatureMovingStrategy() {
@@ -45,34 +46,26 @@ public class CreatureMovingStrategy extends ToTargetMovingStrategy {
 
         // limit velocity magnitude
         float velToRotationAngle = Math.abs(MathHelper.clampAngleDeg(velAngle - rotation.x));
-        float velocityLimit = velToRotationAngle > 90
-                ? maxVelocityBackward
-                : MathUtils.lerp(maxVelocityForward, maxVelocityBackward, velToRotationAngle / 90);
+        if (velToRotationAngle > 90) {
+            temp.limit2(maxVelocityBackward2);
+        }
 //        Gdx.app.log("Velocity", "Before limit " + temp.len() + ", limit = " + velocityLimit);
-        temp.limit2(velocityLimit * velocityLimit);
 //        Gdx.app.log("Velocity", "After limit " + temp.len());
 
         velocity.set(temp);
 
-        float velMag = velocity.len();
-        if (velMag > maxVelMag)
-            maxVelMag = velMag;
-        float accMag = acceleration.len();
-        if (accMag > maxAccMag)
-            maxAccMag = accMag;
+        if (Main.DEBUG) {
+            float velMag = velocity.len();
+            if (velMag > maxVelMag)
+                maxVelMag = velMag;
+            float accMag = acceleration.len();
+            if (accMag > maxAccMag)
+                maxAccMag = accMag;
+        }
     }
 
     @Override
     protected void rotate(Vector2 velocity, Vector2 rotation, float dt) {
-    }
-
-    public float getMaxVelocityForward() {
-        return maxVelocityForward;
-    }
-
-    public void setMaxVelocityForward(float maxVelocityForward) {
-        this.maxVelocityForward = maxVelocityForward;
-        setMaxVelocity(maxVelocityForward);
     }
 
     public float getMaxVelocityBackward() {
@@ -81,6 +74,7 @@ public class CreatureMovingStrategy extends ToTargetMovingStrategy {
 
     public void setMaxVelocityBackward(float maxVelocityBackward) {
         this.maxVelocityBackward = maxVelocityBackward;
+        this.maxVelocityBackward2 = maxVelocityBackward * maxVelocityBackward;
     }
 
     public float getMaxAngleVelocity() {
