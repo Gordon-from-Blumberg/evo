@@ -45,6 +45,8 @@ public enum State {
         public void update(Creature creature, float dt) {
             final float RADIUS = 2.5f;
             final float DIST = 5;
+            final float FOOD_SIZE_MOD = 0.1f;
+            final float CREATURE_SIZE_MOD = 0.1f;
             IntMap<Object> stateParams = creature.getStateParams(this);
             float delay = (float) stateParams.get(0) - dt;
             final Vector2 position = creature.position;
@@ -66,8 +68,8 @@ public enum State {
             for (int i = 0, size = foods.size; i < size; i++) {
                 EvoGameObject food = foods.get(i);
                 if (creature != food && creature.isEatable(food)) {
-                    float div = 2 * food.getSize();
-                    float dist2 = position.dst2(food.position) / div;
+                    float coef = (1 - (food.getSize() - 0.5f) * FOOD_SIZE_MOD) * (1 + (creature.getSize() - 1) * CREATURE_SIZE_MOD);
+                    float dist2 = position.dst2(food.position) * coef;
                     if (dist2 < minDist2) {
                         minDist2 = dist2;
                         target = food;
