@@ -85,6 +85,7 @@ public class Creature extends EvoGameObject {
         acceleration = accelerationCoef * BASE_ACCELERATION;
         ms.setMaxAcceleration(acceleration);
         ms.setMaxDeceleration(accelerationCoef * BASE_DECELERATION);
+        ms.setDecelerationDistance(DECELERATION_DIST * size);
     }
 
     @Override

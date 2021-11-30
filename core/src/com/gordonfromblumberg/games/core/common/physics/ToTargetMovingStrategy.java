@@ -85,9 +85,12 @@ public class ToTargetMovingStrategy extends AccelerationMovingStrategy {
             if (decelerate) {
                 float velocity2 = velocity.len2();
                 float limit2 = velocity2 * velocity2 / (4 * desMovLen2);
-                if (limit2 > maxDeceleration2)
+                if (limit2 > maxDeceleration2) {
+//                    Gdx.app.log("Deceleration", "limit2 " + limit2 + " > " + "max dec2 " + maxDeceleration2);
                     limit2 = maxDeceleration2;
+                }
                 acceleration.setLength2(limit2);
+//                Gdx.app.log("Deceleration", "decelerate: acceleration = " + acceleration);
             } else {
                 acceleration.limit2(maxAcceleration2);
             }
@@ -119,7 +122,7 @@ public class ToTargetMovingStrategy extends AccelerationMovingStrategy {
             desiredVelocity.setLength2(maxVelocity2 > 0
                     ? maxVelocity2 * desMovLen2 / decelerationDistance2
                     : 2 * maxDeceleration * (float) Math.sqrt(desMovLen2));
-//            Gdx.app.log("", "desVelocity = " + desiredVelocity);
+//            Gdx.app.log("Velocity", "decelerate: desVelocity = " + desiredVelocity);
         } else {
             desiredVelocity.setLength2(maxVelocity2 > 0 ? maxVelocity2 : DEFAULT_DESIRED_VELOCITY);
         }
