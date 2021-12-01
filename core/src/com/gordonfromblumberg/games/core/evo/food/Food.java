@@ -30,6 +30,16 @@ public class Food extends EvoGameObject {
         this.value = value;
     }
 
+    public void wasEaten(float value) {
+        this.value -= value;
+        updateSize();
+    }
+
+    public void updateSize() {
+        float size = (float) Math.sqrt(value / 40);
+        setSize(size, size);
+    }
+
     @Override
     public void release() {
         pool.free(this);

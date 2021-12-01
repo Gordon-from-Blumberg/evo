@@ -96,8 +96,7 @@ public enum State {
             if (creature.isPredator()) {
 
             } else {
-                // TODO: check food has not been eaten
-                EvoGameObject target = (EvoGameObject) creature.getTarget();
+                EvoGameObject target = creature.getTarget();
 
                 if (target == null) {
                     creature.setState(FOOD_SEARCHING);
@@ -107,14 +106,29 @@ public enum State {
                 float dist = (creature.getSize() + target.getSize()) * 0.5f * 0.8f;
 //                Gdx.app.log("MOVEMENT_TO_FOOD", "Creature size = " + creature.getSize() + ", target = " + target.getSize() + ", dist = " + dist);
                 if (target.position.dst2(creature.position) <= dist * dist) {
-                    Gdx.app.log("MOVEMENT_TO_FOOD", "Creature #" + creature.getId() + " eats food, real dist = " + target.position.dst(creature.position));
-                    creature.eat(target); // TODO use state for eating
-                    creature.setState(creature.getSatiety() >= creature.getOffspringSatiety()
-                            ? MOVEMENT_TO_HOME
-                            : FOOD_SEARCHING
-                    );
+                    Gdx.app.log("MOVEMENT_TO_FOOD", "Creature #" + creature.getId() + " reaches food, real dist = " + target.position.dst(creature.position));
+                    creature.setState(EATING);
                 }
             }
+        }
+    },
+
+    EATING {
+        @Override
+        public void update(Creature creature, float dt) {
+            EvoGameObject target = creature.getTarget();
+
+            if (target == null) {
+                creature.setState(FOOD_SEARCHING);
+                return;
+            }
+
+            creature.eat(target, dt);
+
+            creature.setState(creature.getSatiety() >= creature.getOffspringSatiety()
+                    ? MOVEMENT_TO_HOME
+                    : FOOD_SEARCHING
+            );
         }
     },
 

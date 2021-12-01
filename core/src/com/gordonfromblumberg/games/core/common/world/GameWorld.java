@@ -115,8 +115,7 @@ public class GameWorld implements Disposable {
             food.setValue(nextFloat(params.getFoodValueFrom(), params.getFoodValueTo()));
             food.setPosition(nextFloat(fromX, toX), nextFloat(fromY, toY));
             food.setRegion("food");
-            float size = (float) Math.sqrt(food.getValue() / 40);
-            food.setSize(size, size);
+            food.updateSize();
             addGameObject(food);
         }
 

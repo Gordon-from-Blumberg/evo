@@ -27,17 +27,19 @@ public class Creature extends EvoGameObject {
     private static final float SIZE_MOD = 0.1f;
     private static final float BASE_SATIETY = AbstractFactory.getInstance().configManager().getFloat("game.creature.satiety");
     private static final float BASE_SENSE_RADIUS = AbstractFactory.getInstance().configManager().getFloat("game.creature.sense");
+    private static final float BASE_BACKWARD_VELOCITY = AbstractFactory.getInstance().configManager().getFloat("game.creature.backward_velocity");
+    private static final float BASE_ANGLE_VELOCITY = AbstractFactory.getInstance().configManager().getFloat("game.creature.angle_velocity");
+    private static final float BASE_MAX_ROTATION = AbstractFactory.getInstance().configManager().getFloat("game.creature.max_rotation");
+    private static final float BASE_ACCELERATION = AbstractFactory.getInstance().configManager().getFloat("game.creature.acceleration");
+    private static final float BASE_DECELERATION = AbstractFactory.getInstance().configManager().getFloat("game.creature.deceleration");
+    private static final float DECELERATION_DIST = AbstractFactory.getInstance().configManager().getFloat("game.creature.deceleration_distance");
+    private static final float BASE_EAT_SPEED = AbstractFactory.getInstance().configManager().getFloat("game.creature.eat_speed");
     private static final float SENSE_MOD = 0.1f;
     private static final float VELOCITY_MOD = 0.1f;
-    private static final float BASE_BACKWARD_VELOCITY = 2;
     private static final float SIZE_VELOCITY_MOD = 0.05f;
-    private static final float BASE_ANGLE_VELOCITY = 180;
     private static final float ANGLE_VELOCITY_MOD = 0.05f;
-    private static final float BASE_MAX_ROTATION = 250;
     private static final float MAX_ROTATION_MOD = 0.05f;
-    private static final float BASE_ACCELERATION = 5;
-    private static final float BASE_DECELERATION = 6;
-    private static final float DECELERATION_DIST = 3;
+    private static final float EAT_SPEED_MOD = 0.1f;
 
     private final DNA dna = new DNA();
     private final IntMap[] stateParams = new IntMap[State.values().length];
@@ -50,7 +52,9 @@ public class Creature extends EvoGameObject {
     private float senseRadius;
     private float acceleration;
     private float requiredSatiety, offspringSatiety, satiety;
+    private float eatSpeed;
     private int offspringCount, offspringProduced;
+
     private SpawnPoint spawnPoint;
 
     private Creature() {
@@ -73,6 +77,7 @@ public class Creature extends EvoGameObject {
         offspringCount = 1;
         offspringProduced = 0;
         satiety = 0;
+        eatSpeed = (1 + EAT_SPEED_MOD * dna.getMouthSize()) * BASE_EAT_SPEED * size;
 
         float velocityCoef = 1 + VELOCITY_MOD * dna.getVelocity();
         CreatureMovingStrategy ms = (CreatureMovingStrategy) movingStrategy;
@@ -104,20 +109,33 @@ public class Creature extends EvoGameObject {
         ((CreatureMovingStrategy) movingStrategy).setTarget(x, y);
     }
 
-    public void eat(EvoGameObject foodObject) {
+    public void eat(EvoGameObject foodObject, float dt) {
         // TODO for predators
         if (foodObject instanceof Food) {
             Food food = (Food) foodObject;
-            satiety += food.getValue();
 
-            Iterator<Creature> chaserIt = food.getChasers().iterator();
-            while(chaserIt.hasNext()) {
-                Creature chaser = chaserIt.next();
-                chaserIt.remove();
-                chaser.setTarget(null);
+            float eaten = eatSpeed * dt;
+
+            float leftToEat = offspringSatiety - satiety;
+            if (eaten > leftToEat)
+                eaten = leftToEat;
+
+            if (eaten > food.getValue()) {
+                satiety += food.getValue();
+
+                Iterator<Creature> chaserIt = food.getChasers().iterator();
+                while(chaserIt.hasNext()) {
+                    Creature chaser = chaserIt.next();
+                    chaserIt.remove();
+                    chaser.setTarget(null);
+                }
+
+                gameWorld.removeGameObject(food);
+                return;
             }
 
-            gameWorld.removeGameObject(food);
+            satiety += eaten;
+            food.wasEaten(eaten);
         }
     }
 
@@ -196,7 +214,7 @@ public class Creature extends EvoGameObject {
         return stateParams[state.ordinal()];
     }
 
-    public GameObject getTarget() {
+    public EvoGameObject getTarget() {
         return target;
     }
 
@@ -215,6 +233,7 @@ public class Creature extends EvoGameObject {
         float baseReqSatiety = (float) Math.pow(size, 3);
         float reqSatietyMod = 0.1f * dna.getVelocity();
         reqSatietyMod += 0.1f * dna.getSense();
+        reqSatietyMod += 0.05f * dna.getMouthSize();
         return baseReqSatiety * (1 + reqSatietyMod) * BASE_SATIETY;
     }
 
