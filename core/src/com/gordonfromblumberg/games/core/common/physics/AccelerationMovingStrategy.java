@@ -48,6 +48,10 @@ public class AccelerationMovingStrategy implements MovingStrategy {
         this.maxAcceleration2 = maxAcceleration * maxAcceleration;
     }
 
+    public void setFriction(float friction) {
+        this.friction = friction;
+    }
+
     protected void updateVelocity(Vector2 velocity, Vector2 acceleration, Vector2 rotation, float dt) {
         velocity.mulAdd(acceleration, dt);
         if (maxVelocity2 > 0)

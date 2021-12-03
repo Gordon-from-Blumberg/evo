@@ -1,5 +1,7 @@
 package com.gordonfromblumberg.games.core.evo.creature;
 
+import com.badlogic.gdx.Gdx;
+import com.gordonfromblumberg.games.core.common.Main;
 import com.gordonfromblumberg.games.core.common.factory.AbstractFactory;
 import com.gordonfromblumberg.games.core.common.utils.RandomUtils;
 
@@ -13,6 +15,7 @@ public class DNA {
         FOOD_TYPE(false, false), // TODO
         SIZE(true, true),
         VELOCITY(true, true),
+        ROTATION(true, true),
         SENSE(true, true),
         MOUTH_SIZE(true, true),
         FERTILITY(true, true, (byte) 1, (byte) 0, Byte.MAX_VALUE);
@@ -59,6 +62,10 @@ public class DNA {
         return genes[Gene.VELOCITY.ordinal()];
     }
 
+    byte getRotation() {
+        return genes[Gene.ROTATION.ordinal()];
+    }
+
     byte getSense() {
         return genes[Gene.SENSE.ordinal()];
     }
@@ -83,6 +90,9 @@ public class DNA {
                     genes[geneType.ordinal()] = (byte) (current + 1);
                 else
                     genes[geneType.ordinal()] = (byte) (current - 1);
+
+                if (Main.DEBUG)
+                    Gdx.app.log("Mutation", geneType + ": " + current + " -> " + genes[geneType.ordinal()]);
             }
         }
     }
@@ -92,7 +102,7 @@ public class DNA {
     }
 
     public String getDescription() {
-        return "Genes: SIZE=" + genes[Gene.SIZE.ordinal()] + ", VELOCITY=" + genes[Gene.VELOCITY.ordinal()]
+        return "Genes: SIZE=" + genes[Gene.SIZE.ordinal()] + ", VELOCITY=" + genes[Gene.VELOCITY.ordinal()] + ", ROTATION=" + genes[Gene.ROTATION.ordinal()]
                 + ", SENSE=" + genes[Gene.SENSE.ordinal()] + ", MOUTH_SIZE=" + genes[Gene.MOUTH_SIZE.ordinal()];
     }
 }

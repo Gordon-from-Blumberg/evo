@@ -125,10 +125,11 @@ public enum State {
 
             creature.eat(target, dt);
 
-            creature.setState(creature.getSatiety() >= creature.getOffspringSatiety()
-                    ? MOVEMENT_TO_HOME
-                    : FOOD_SEARCHING
-            );
+            if (creature.getSatiety() >= creature.getOffspringSatiety())
+                creature.setState(MOVEMENT_TO_HOME);
+            // food has been eaten
+            else if (creature.getTarget() == null)
+                creature.setState(FOOD_SEARCHING);
         }
     },
 

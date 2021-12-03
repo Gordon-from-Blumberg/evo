@@ -16,10 +16,6 @@ public class CreatureMovingStrategy extends ToTargetMovingStrategy {
     private float maxVelocityBackward, maxVelocityBackward2;
     private float maxAngleVelocity, maxRotation;
 
-    public CreatureMovingStrategy() {
-        friction = 1.5f;
-    }
-
     @Override
     protected void updateVelocity(Vector2 velocity, Vector2 acceleration, Vector2 rotation, float dt) {
 //        Gdx.app.log("Acceleration", acceleration + ", mag = " + acceleration.len());
@@ -91,5 +87,9 @@ public class CreatureMovingStrategy extends ToTargetMovingStrategy {
 
     public void setMaxRotation(float maxRotation) {
         this.maxRotation = maxRotation;
+    }
+
+    public void reset() {
+        maxVelMag = maxAccMag = 0;
     }
 }
