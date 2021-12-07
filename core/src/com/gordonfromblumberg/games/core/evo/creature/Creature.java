@@ -27,8 +27,8 @@ public class Creature extends EvoGameObject {
     private enum Param {
         SIZE(1, 0f, 0.1f, 0f),
         SENSE(getConfigF("game.creature.sense"), 0.075f, 0.1f, 0.1f),
-        ACCELERATION(getConfigF("game.creature.acceleration"), 0.1f, 0.1f, 0.1f),
-        DECELERATION(getConfigF("game.creature.deceleration"), -0.05f, 0.05f, 0f),
+        ACCELERATION(getConfigF("game.creature.acceleration"), 0.075f, 0.1f, 0.1f),
+        DECELERATION(getConfigF("game.creature.deceleration"), -0.05f, 0.075f, 0f),
         DECELERATION_DIST(getConfigF("game.creature.deceleration_distance"), 0.1f, 0f, 0f),
         BACKWARD_VELOCITY(getConfigF("game.creature.backward_velocity"), 0.075f, 0.1f, 0f),
         ANGLE_VELOCITY(getConfigF("game.creature.angle_velocity"), -0.075f, 0.1f, 0f),
@@ -239,10 +239,10 @@ public class Creature extends EvoGameObject {
     private float calcRequiredSatiety() {
         float baseReqSatiety = (float) Math.pow(size, 3);
         float reqSatietyMod = 0;
-        reqSatietyMod += Param.SENSE.satietyMod * dna.getSense();
-        reqSatietyMod += Param.ACCELERATION.satietyMod * dna.getVelocity();
-        reqSatietyMod += Param.MAX_ROTATION.satietyMod * dna.getRotation();
-        reqSatietyMod += Param.EAT_SPEED.satietyMod * dna.getMouthSize();
+//        reqSatietyMod += Param.SENSE.satietyMod * dna.getSense();
+//        reqSatietyMod += Param.ACCELERATION.satietyMod * dna.getVelocity();
+//        reqSatietyMod += Param.MAX_ROTATION.satietyMod * dna.getRotation();
+//        reqSatietyMod += Param.EAT_SPEED.satietyMod * dna.getMouthSize();
         return baseReqSatiety * (1 + reqSatietyMod) * BASE_SATIETY;
     }
 
@@ -323,6 +323,10 @@ public class Creature extends EvoGameObject {
 
     public int getGeneration() {
         return generation;
+    }
+
+    public byte getSizeGene() {
+        return dna.getSize();
     }
 
     private static float getConfigF(String propertyName) {

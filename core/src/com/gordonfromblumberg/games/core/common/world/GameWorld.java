@@ -312,6 +312,7 @@ public class GameWorld implements Disposable {
     }
 
     public void update(float delta) {
+//        delta *= 4;
         if (started && !paused) {
             time += delta;
 
