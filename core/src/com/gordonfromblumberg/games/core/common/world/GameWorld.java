@@ -20,6 +20,7 @@ import com.gordonfromblumberg.games.core.common.utils.RandomUtils;
 import com.gordonfromblumberg.games.core.evo.event.HomeReachedEvent;
 import com.gordonfromblumberg.games.core.evo.state.State;
 import com.gordonfromblumberg.games.core.evo.world.SpawnPoint;
+import com.gordonfromblumberg.games.core.evo.world.Statistic;
 import com.gordonfromblumberg.games.core.evo.world.WorldParams;
 import com.gordonfromblumberg.games.core.evo.creature.Creature;
 import com.gordonfromblumberg.games.core.evo.event.NewGenerationEvent;
@@ -41,8 +42,9 @@ public class GameWorld implements Disposable {
 
     public int width, height;
 
+    private final Statistic statistic = new Statistic();
     private int creatureCount, foodCount, homeReachedCount, birthedCount;
-    int generation;
+//    int generation;
     int generationsToSimulate;
 
     final Array<SpawnPoint> spawnPoints = new Array<>(30 * 4);
@@ -75,17 +77,21 @@ public class GameWorld implements Disposable {
     }
 
     public void newGeneration() {
-        generation++;
         homeReachedCount = 0;
+        statistic.reset();
 
         generateFood();
-        if (generation == 1)
+        if (statistic.nextGeneration() == 1)
             createFirstGeneration();
         else
             produceOffspring();
         placeCreatures();
+        for (EvoGameObject ego : gameObjects)
+            statistic.add(ego);
+        statistic.print();
+
         NewGenerationEvent event = NewGenerationEvent.getInstance();
-        event.setGenerationNumber(generation);
+        event.setGenerationNumber(statistic.getGeneration());
         event.setCreatureCount(creatureCount);
         event.setBirthedCount(birthedCount);
         event.setFoodCount(foodCount);
@@ -138,7 +144,7 @@ public class GameWorld implements Disposable {
         for (int i = 0, size = gameObjects.size; i < size; i++) {
             EvoGameObject ego;
             if ((ego = gameObjects.get(i)) instanceof Creature && ((Creature) ego).readyToReproduce()) {
-                ((Creature) ego).produceOffspring(generation);
+                ((Creature) ego).produceOffspring(statistic.getGeneration());
             }
         }
     }
@@ -226,7 +232,7 @@ public class GameWorld implements Disposable {
                 Creature creature = (Creature) go;
                 if (creature.getSatiety() < creature.getRequiredSatiety()) {
                     Gdx.app.log("Creature", creature + " - " + creature.getDnaDescription() + " did not eat enough food, "
-                            + "so did not survive after " + (generation - creature.getGeneration()) + " generations");
+                            + "so did not survive after " + (statistic.getGeneration() - creature.getGeneration()) + " generations");
                     creature.release();
                     goIt.remove();
                     creatureCount--;

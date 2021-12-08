@@ -78,25 +78,25 @@ public class Creature extends EvoGameObject {
         this.generation = generation;
         isPredator = dna.getFoodType() == DNA.FoodType.PREDATOR;
         setRegion(isPredator ? "predator" : "herbivorous");
-        byte dnaSize = dna.getSize();
+        byte dnaSize = dna.getGeneValue(Gene.SIZE);
         float size = calcParam(Param.SIZE, dnaSize, dnaSize);
         setSize(size, size);
-        senseRadius = calcParam(Param.SENSE, dnaSize, dna.getSense());
+        senseRadius = calcParam(Param.SENSE, dnaSize, dna.getGeneValue(Gene.SENSE));
         requiredSatiety = calcRequiredSatiety();
         offspringSatiety = calcOffspringSatiety();
         offspringCount = 1;
         offspringProduced = 0;
         satiety = 0;
-        eatSpeed = calcParam(Param.EAT_SPEED, dnaSize, dna.getMouthSize());
+        eatSpeed = calcParam(Param.EAT_SPEED, dnaSize, dna.getGeneValue(Gene.MOUTH_SIZE));
 
         CreatureMovingStrategy ms = (CreatureMovingStrategy) movingStrategy;
-        acceleration = calcParam(Param.ACCELERATION, dnaSize, dna.getVelocity());
+        acceleration = calcParam(Param.ACCELERATION, dnaSize, dna.getGeneValue(Gene.VELOCITY));
         ms.setMaxAcceleration(acceleration);
-        ms.setMaxDeceleration(calcParam(Param.DECELERATION, dnaSize, dna.getVelocity()));
+        ms.setMaxDeceleration(calcParam(Param.DECELERATION, dnaSize, dna.getGeneValue(Gene.VELOCITY)));
         ms.setDecelerationDistance(calcParam(Param.DECELERATION_DIST, dnaSize, (byte) 0));
-        ms.setMaxVelocityBackward(calcParam(Param.BACKWARD_VELOCITY, dnaSize, dna.getVelocity()));
-        ms.setMaxAngleVelocity(calcParam(Param.ANGLE_VELOCITY, dnaSize, dna.getRotation()));
-        ms.setMaxRotation(calcParam(Param.MAX_ROTATION, dnaSize, dna.getRotation()));
+        ms.setMaxVelocityBackward(calcParam(Param.BACKWARD_VELOCITY, dnaSize, dna.getGeneValue(Gene.VELOCITY)));
+        ms.setMaxAngleVelocity(calcParam(Param.ANGLE_VELOCITY, dnaSize, dna.getGeneValue(Gene.ROTATION)));
+        ms.setMaxRotation(calcParam(Param.MAX_ROTATION, dnaSize, dna.getGeneValue(Gene.ROTATION)));
         ms.setFriction(calcParam(Param.FRICTION, dnaSize, (byte) 0));
     }
 
@@ -239,10 +239,10 @@ public class Creature extends EvoGameObject {
     private float calcRequiredSatiety() {
         float baseReqSatiety = (float) Math.pow(size, 3);
         float reqSatietyMod = 0;
-//        reqSatietyMod += Param.SENSE.satietyMod * dna.getSense();
-//        reqSatietyMod += Param.ACCELERATION.satietyMod * dna.getVelocity();
-//        reqSatietyMod += Param.MAX_ROTATION.satietyMod * dna.getRotation();
-//        reqSatietyMod += Param.EAT_SPEED.satietyMod * dna.getMouthSize();
+        reqSatietyMod += Param.SENSE.satietyMod * dna.getGeneValue(Gene.SENSE);
+        reqSatietyMod += Param.ACCELERATION.satietyMod * dna.getGeneValue(Gene.VELOCITY);
+        reqSatietyMod += Param.MAX_ROTATION.satietyMod * dna.getGeneValue(Gene.ROTATION);
+        reqSatietyMod += Param.EAT_SPEED.satietyMod * dna.getGeneValue(Gene.MOUTH_SIZE);
         return baseReqSatiety * (1 + reqSatietyMod) * BASE_SATIETY;
     }
 
@@ -325,8 +325,8 @@ public class Creature extends EvoGameObject {
         return generation;
     }
 
-    public byte getSizeGene() {
-        return dna.getSize();
+    public byte getGeneValue(Gene gene) {
+        return dna.getGeneValue(gene);
     }
 
     private static float getConfigF(String propertyName) {

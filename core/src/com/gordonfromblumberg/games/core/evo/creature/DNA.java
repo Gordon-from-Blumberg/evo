@@ -7,37 +7,8 @@ import com.gordonfromblumberg.games.core.common.utils.RandomUtils;
 
 public class DNA {
     private static final float MUTATION_CHANCE = AbstractFactory.getInstance().configManager().getFloat("game.mutation.chance");
-    private static final byte MIN_VALUE = -9;
 
     private final byte[] genes = new byte[Gene.values().length];
-
-    enum Gene {
-        FOOD_TYPE(false, false), // TODO
-        SIZE(true, true),
-        VELOCITY(true, true),
-        ROTATION(true, true),
-        SENSE(true, true),
-        MOUTH_SIZE(true, true),
-        FERTILITY(true, true, (byte) 1, (byte) 0, Byte.MAX_VALUE);
-
-        private final boolean mutable;
-        private final boolean mutableByOne;
-        private final byte defaultValue;
-        private final byte minValue;
-        private final byte maxValue;
-
-        Gene(boolean mutable, boolean mutableByOne) {
-            this(mutable, mutableByOne, (byte) 0, MIN_VALUE, Byte.MAX_VALUE);
-        }
-
-        Gene(boolean mutable, boolean mutableByOne, byte defaultValue, byte minValue, byte maxValue) {
-            this.mutable = mutable;
-            this.mutableByOne = mutableByOne;
-            this.defaultValue = defaultValue;
-            this.minValue = minValue;
-            this.maxValue = maxValue;
-        }
-    }
 
     enum FoodType {
         HERBIVOROUS,
@@ -54,28 +25,8 @@ public class DNA {
         return FoodType.values()[genes[Gene.FOOD_TYPE.ordinal()]];
     }
 
-    byte getSize() {
-        return genes[Gene.SIZE.ordinal()];
-    }
-
-    byte getVelocity() {
-        return genes[Gene.VELOCITY.ordinal()];
-    }
-
-    byte getRotation() {
-        return genes[Gene.ROTATION.ordinal()];
-    }
-
-    byte getSense() {
-        return genes[Gene.SENSE.ordinal()];
-    }
-
-    byte getMouthSize() {
-        return genes[Gene.MOUTH_SIZE.ordinal()];
-    }
-
-    byte getFertility() {
-        return genes[Gene.FERTILITY.ordinal()];
+    byte getGeneValue(Gene gene) {
+        return genes[gene.ordinal()];
     }
 
     void mutate() {
