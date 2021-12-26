@@ -21,12 +21,13 @@ public abstract class AbstractScreen implements Screen {
 
     protected AssetManager assets;
 
-    protected final SpriteBatch batch;
+    protected SpriteBatch batch;
     protected Color color = Color.BLACK;
 
     protected Stage stage;
     protected Viewport viewport, uiViewport;
     protected OrthographicCamera camera, uiCamera;
+    protected Renderer worldRenderer, uiRenderer;
 
     protected Table uiRootTable;
 
@@ -34,6 +35,11 @@ public abstract class AbstractScreen implements Screen {
 
     protected AbstractScreen(SpriteBatch batch) {
         this.batch = batch;
+    }
+
+    protected AbstractScreen(Renderer worldRenderer, Renderer uiRenderer) {
+        this.worldRenderer = worldRenderer;
+        this.uiRenderer = uiRenderer;
     }
 
     protected void initialize() {
@@ -62,17 +68,22 @@ public abstract class AbstractScreen implements Screen {
 
         update(delta);
 
-        batch.begin();
-        renderWorld(delta);
+//        batch.begin();
+        worldRenderer.render(delta);
+//        renderWorld(delta);
         batch.end();
 
-        renderUi();
+//        renderUi();
+        uiRenderer.render(delta);
     }
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height, true);
-        uiViewport.update(width, height, true);
+        worldRenderer.resize(width, height);
+        uiRenderer.resize(width, height);
+
+//        viewport.update(width, height, true);
+//        uiViewport.update(width, height, true);
     }
 
     @Override
