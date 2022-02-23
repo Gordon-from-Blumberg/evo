@@ -21,11 +21,6 @@ public class MainMenuScreen extends AbstractScreen {
     }
 
     @Override
-    public void resize(int width, int height) {
-        uiViewport.update(width, height, true);
-    }
-
-    @Override
     protected void update(float delta) {
     }
 

@@ -68,25 +68,9 @@ public class GameScreen extends AbstractScreen {
     }
 
     @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height, false);
-        uiViewport.update(width, height, true);
-    }
-
-    @Override
     protected void update(float delta) {
         super.update(delta);            // apply camera moving and update batch projection matrix
         gameWorld.update(delta);        // update game state
-    }
-
-    @Override
-    protected void renderWorld(float delta) {
-        renderer.render(batch);
-    }
-
-    @Override
-    protected void renderUi() {
-        super.renderUi();
     }
 
     @Override

@@ -25,8 +25,8 @@ public abstract class AbstractScreen implements Screen {
     protected Color color = Color.BLACK;
 
     protected Stage stage;
-    protected Viewport viewport, uiViewport;
-    protected OrthographicCamera camera, uiCamera;
+    protected Viewport viewport;
+    protected OrthographicCamera camera;
     protected Renderer worldRenderer, uiRenderer;
 
     protected Table uiRootTable;
@@ -46,7 +46,7 @@ public abstract class AbstractScreen implements Screen {
         assets = Main.getInstance().assets();
 
         createWorldViewport();
-        createUiViewport();
+        createUiRenderer();
 
         createUI();
     }
@@ -69,9 +69,10 @@ public abstract class AbstractScreen implements Screen {
         update(delta);
 
 //        batch.begin();
-        worldRenderer.render(delta);
+        if (worldRenderer != null)
+            worldRenderer.render(delta);
 //        renderWorld(delta);
-        batch.end();
+//        batch.end();
 
 //        renderUi();
         uiRenderer.render(delta);
@@ -79,11 +80,9 @@ public abstract class AbstractScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        worldRenderer.resize(width, height);
+        if (worldRenderer != null)
+            worldRenderer.resize(width, height);
         uiRenderer.resize(width, height);
-
-//        viewport.update(width, height, true);
-//        uiViewport.update(width, height, true);
     }
 
     @Override
@@ -102,11 +101,6 @@ public abstract class AbstractScreen implements Screen {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
     }
-    protected void renderWorld(float delta) {}
-    protected void renderUi() {
-        stage.act();
-        stage.draw();
-    }
 
     protected void createWorldViewport() {
         final ConfigManager configManager = AbstractFactory.getInstance().configManager();
@@ -121,17 +115,18 @@ public abstract class AbstractScreen implements Screen {
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
 
-    private void createUiViewport() {
+    private void createUiRenderer() {
         final ConfigManager configManager = AbstractFactory.getInstance().configManager();
         final float worldWidth = configManager.getFloat("worldWidth");
         final float minRatio = configManager.getFloat("minRatio");
         final float maxRatio = configManager.getFloat("maxRatio");
         final float minWorldHeight = worldWidth / maxRatio;
         final float maxWorldHeight = worldWidth / minRatio;
-        uiCamera = new OrthographicCamera();
-        uiCamera.setToOrtho(false);
-        uiViewport = new ExtendViewport(worldWidth, minWorldHeight, worldWidth, maxWorldHeight, uiCamera);
-        stage = new Stage(uiViewport, batch);
+        OrthographicCamera camera = new OrthographicCamera();
+        camera.setToOrtho(false);
+        Viewport viewport = new ExtendViewport(worldWidth, minWorldHeight, worldWidth, maxWorldHeight, camera);
+        stage = new Stage(viewport, batch);
+        uiRenderer = new UIRenderer(camera, viewport, stage);
     }
 
     protected void createUI() {
